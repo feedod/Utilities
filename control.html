@@ -251,9 +251,7 @@
             <div class="space-y-3">
               <template x-for="item in scannedItems" :key="item.id">
                 <div
-                  class="product-card slide-up"
-                  x-init="$nextTick(() => renderCodes(item))"
-                >
+                  class="product-card slide-up">
                   <div class="flex items-center justify-between p-4 pb-3">
                     <p
                       class="code-display cursor-pointer truncate text-base font-bold text-text"
@@ -568,14 +566,25 @@
             this.permissionError = false;
             TelegramApp.haptic("light");
 
+            if (!TelegramApp.available) {
+  this.permissionError = true;
+  this.isScanning = false;
+  return;
+}
+
             TelegramApp.scanQr(
               "Наведите на QR-код",
               (result) => {
-                const code = this.extractCode(result);
+                const parsed = this.extractCode(result);
+if (!parsed) {
+  TelegramApp.closeScanQr();
+  this.showToast("Неподдерживаемый формат", "error");
+  this.isScanning = false;
+  return true;
+}
 
-                if (!code) return false;
-
-                if (this.scannedCodes[code]) {
+                
+                if (this.scannedCodes[parsed.ean]) {
                   TelegramApp.closeScanQr();
                   this.isScanning = false;
                   this.$nextTick(() => {
@@ -585,14 +594,14 @@
                   return true;
                 }
 
-                this.scannedCodes[code] = true;
-                this.idCounter++;
+                this.scannedCodes[parsed.ean] = true;
 
                 const item = {
-                  id: this.idCounter,
-                  code,
-                  timestamp: Date.now(),
-                };
+  id: ++this.idCounter,
+  code: parsed.raw,
+  ean: parsed.ean,
+  timestamp: Date.now(),
+};
 
                 this.scannedItems.unshift(item);
                 this.saveHistory();
@@ -652,16 +661,18 @@
           },
 
           renderBarcode(item) {
+            if (!item.ean) return;
+            
             const el = document.getElementById(`bar_${item.id}`);
             if (!el) return;
 
             try {
               let format = "ean13";
-              if (item.code.length === 8) {
+              if (item.ean.length === 8) {
                 format = "ean8";
               }
 
-              JsBarcode(el, item.code, {
+              JsBarcode(el, item.ean, {
                 format: format,
                 lineColor: "#000000",
                 background: "#ffffff",
@@ -684,20 +695,20 @@
             const trimmed = text.trim();
             if (!trimmed.length || trimmed.length > 2048) return null;
 
-            let code = trimmed;
-            if (trimmed.startsWith("CEN;")) {
-              const parts = trimmed.split(";");
-              if (parts.length >= 2) {
-                code = parts[1];
-              }
-            }
+            let cleaned = trimmed;
+            if (cleaned.startsWith("CEN;")) {
+  const parts = cleaned.split(";");
+  if (parts.length < 2) return null;
+  cleaned = parts[1].replace(/\D/g, '');
+}
+if (!/^\d{8}$/.test(cleaned) && !/^\d{13}$/.test(cleaned)) return null;
 
-            if (/^\d{13}$/.test(code)) {
-              return code;
-            } else if (/^\d{8}$/.test(code)) {
-              return code;
-            }
-
+            if (/^\d{8}$/.test(cleaned) || /^\d{13}$/.test(cleaned)) {
+    return {
+      raw: trimmed,
+      ean: cleaned,
+    };
+  }
             return null;
           },
 
@@ -720,7 +731,7 @@
           removeItem(id) {
             TelegramApp.haptic("medium");
             const item = this.scannedItems.find((i) => i.id === id);
-            if (item) delete this.scannedCodes[item.code];
+            if (item) delete this.scannedCodes[item.ean];
             this.scannedItems = this.scannedItems.filter((i) => i.id !== id);
             this.saveHistory();
             this.setupButtons();
@@ -764,11 +775,20 @@
               if (!raw) return;
               const data = JSON.parse(raw);
               if (data?.items && Array.isArray(data.items)) {
-                this.scannedItems = data.items;
-                this.idCounter = data.counter ?? data.items.length;
+                this.scannedItems = data.items.map(i => ({
+  id: i.id ?? ++this.idCounter,
+  code: i.code ?? i.raw ?? "",
+  ean: i.ean ?? ( /^\d{8,13}$/.test(i.code) ? i.code : null ),
+  timestamp: i.timestamp ?? Date.now()
+}));
+
+                this.idCounter = Math.max(
+  data.counter ?? 0,
+  ...(data.items.map(i => (typeof i.id === 'number' ? i.id : 0)))
+);
                 this.scannedCodes = Object.fromEntries(
-                  data.items.map((i) => [i.code, true]),
-                );
+  this.scannedItems.filter(it => it.ean).map(it => [it.ean, true])
+);
 
                 if (this.scannedItems.length > 0) {
                   this.$nextTick(() => {

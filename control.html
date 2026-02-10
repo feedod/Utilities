@@ -571,11 +571,11 @@
             TelegramApp.scanQr(
               "Наведите на QR-код",
               (result) => {
-                const code = this.extractCode(result);
+                const extracted = this.extractCode(result);
 
-                if (!code) return false;
+                if (!extracted) return false;
 
-                if (this.scannedCodes[code]) {
+                if (this.scannedCodes[extracted]) {
                   TelegramApp.closeScanQr();
                   this.isScanning = false;
                   this.$nextTick(() => {
@@ -585,12 +585,13 @@
                   return true;
                 }
 
-                this.scannedCodes[code] = true;
+                this.scannedCodes[extracted] = true;
                 this.idCounter++;
 
                 const item = {
                   id: this.idCounter,
-                  code,
+                  original: result,
+                  code: extracted,
                   timestamp: Date.now(),
                 };
 
@@ -631,7 +632,7 @@
                 width: 260,
                 height: 260,
                 type: "svg",
-                data: item.code,
+                data: item.original,
                 margin: 0,
                 qrOptions: {
                   typeNumber: 0,
@@ -667,7 +668,7 @@
                 background: "#ffffff",
                 width: 1.5,
                 height: 60,
-                displayValue: true,
+                displayValue: false,
                 margin: 4,
                 flat: true,
               });

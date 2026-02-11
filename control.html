@@ -378,16 +378,11 @@
           if (!tg) return;
           try {
             tg.ready();
-            tg.expand();
-            tg.enableClosingConfirmation();
+            tg.requestFullscreen();
             tg.disableVerticalSwipes();
             tg.setHeaderColor("#000000");
             tg.setBackgroundColor("#000000");
             tg.setBottomBarColor("#0A0A0A");
-            tg.BackButton.hide();
-            tg.SettingsButton.hide();
-            tg.MainButton.showProgress(false);
-            tg.SecondaryButton.showProgress(false);
           } catch (e) {}
         },
 

@@ -7,7 +7,7 @@
       content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
     />
     <meta name="color-scheme" content="dark" />
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tma.js/sdk@3.1.6/dist/index.iife.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <style type="text/tailwindcss">
@@ -364,146 +364,67 @@
     </div>
 
     <script>
-      const TelegramApp = {
-        get tg() {
-          return globalThis.Telegram?.WebApp ?? null;
-        },
+      const { init, mainButton, secondaryButton, hapticFeedback, cloudStorage, scanning, showConfirm } = window.tmaJsSdk;
 
+      init();
+
+      const TelegramApp = {
         get available() {
-          return !!this.tg;
+          return true;
         },
 
         init() {
-          const tg = this.tg;
-          if (!tg) return;
-          try {
-            tg.ready();
-            tg.requestFullscreen();
-            tg.disableVerticalSwipes();
-            tg.setHeaderColor("#000000");
-            tg.setBackgroundColor("#000000");
-            tg.setBottomBarColor("#0A0A0A");
-          } catch (e) {}
+          // Already initialized by init()
         },
 
         haptic(style = "light") {
           try {
-            this.tg?.HapticFeedback?.impactOccurred(style);
+            hapticFeedback.impactOccurred(style);
           } catch {}
         },
 
         notify(type = "success") {
           try {
-            this.tg?.HapticFeedback?.notificationOccurred(type);
+            hapticFeedback.notificationOccurred(type);
           } catch {}
         },
 
         confirm(msg, cb) {
           try {
-            if (typeof this.tg?.showConfirm === "function") {
-              this.tg.showConfirm(msg, cb);
-              return;
-            }
+            showConfirm(msg, cb);
           } catch {}
           cb(confirm(msg));
         },
 
-        alert(msg) {
-          try {
-            if (typeof this.tg?.showAlert === "function") {
-              this.tg.showAlert(msg);
-              return;
-            }
-          } catch {}
-          alert(msg);
-        },
-
-        popup(params) {
-          try {
-            if (typeof this.tg?.showPopup === "function") {
-              this.tg.showPopup(params);
-            }
-          } catch {}
-        },
-
         closeScanQr() {
           try {
-            this.tg?.closeScanQrPopup?.();
+            scanning.close();
           } catch {}
         },
 
         scanQr(text, onResult, onClose) {
-          const tg = this.tg;
-          if (!tg || typeof tg.showScanQrPopup !== "function") {
+          try {
+            scanning.open({ text: text ?? "" }).then(onResult).catch(onClose);
+          } catch {
             onClose?.();
-            return;
           }
-
-          let closed = false;
-
-          const handleClose = () => {
-            if (closed) return;
-            closed = true;
-            tg.offEvent("scanQrPopupClosed", handleClose);
-            onClose?.();
-          };
-
-          tg.onEvent("scanQrPopupClosed", handleClose);
-
-          tg.showScanQrPopup({ text: text ?? "" }, (result) => {
-            if (!result) return false;
-            const shouldClose = onResult(result);
-            if (shouldClose) {
-              closed = true;
-              tg.offEvent("scanQrPopupClosed", handleClose);
-              this.closeScanQr();
-            }
-            return shouldClose;
-          });
         },
 
         async cloudGet(key) {
-          const tg = this.tg;
-          if (!tg?.CloudStorage) throw new Error("CloudStorage unavailable");
-          return new Promise((resolve, reject) => {
-            tg.CloudStorage.getItem(key, (err, value) => {
-              if (err) reject(new Error(err));
-              else resolve(value);
-            });
-          });
+          try {
+            return await cloudStorage.get(key);
+          } catch (e) {
+            throw new Error(e.message);
+          }
         },
 
         async cloudSet(key, value) {
-          const tg = this.tg;
-          if (!tg?.CloudStorage) throw new Error("CloudStorage unavailable");
-          return new Promise((resolve, reject) => {
-            tg.CloudStorage.setItem(key, value, (err, success) => {
-              if (err) reject(new Error(err));
-              else resolve(success);
-            });
-          });
-        },
-
-        async cloudGetKeys() {
-          const tg = this.tg;
-          if (!tg?.CloudStorage) throw new Error("CloudStorage unavailable");
-          return new Promise((resolve, reject) => {
-            tg.CloudStorage.getKeys((err, keys) => {
-              if (err) reject(new Error(err));
-              else resolve(keys);
-            });
-          });
-        },
-
-        async cloudRemove(key) {
-          const tg = this.tg;
-          if (!tg?.CloudStorage) throw new Error("CloudStorage unavailable");
-          return new Promise((resolve, reject) => {
-            tg.CloudStorage.removeItem(key, (err, success) => {
-              if (err) reject(new Error(err));
-              else resolve(success);
-            });
-          });
+          try {
+            await cloudStorage.set(key, value);
+            return true;
+          } catch (e) {
+            throw new Error(e.message);
+          }
         },
       };
 
@@ -555,7 +476,6 @@
           _toastTimer: null,
           _mainHandler: null,
           _secondaryHandler: null,
-          _scanStartTime: 0,
 
           async init() {
             TelegramApp.init();
@@ -565,37 +485,28 @@
           },
 
           setupButtons() {
-            const tg = TelegramApp.tg;
-            if (!tg) return;
-
-            const mb = tg.MainButton;
-            const sb = tg.SecondaryButton;
+            if (!TelegramApp.available) return;
 
             if (this._mainHandler) {
-              mb.offClick(this._mainHandler);
+              mainButton.off('click', this._mainHandler);
             }
             if (this._secondaryHandler) {
-              sb.offClick(this._secondaryHandler);
+              secondaryButton.off('click', this._secondaryHandler);
             }
 
             this._mainHandler = () => this.scan();
             this._secondaryHandler = () => this.confirmClearAll();
 
-            mb.setText("Сканировать QR");
-            mb.color = "#30d158";
-            mb.textColor = "#ffffff";
-            mb.onClick(this._mainHandler);
-            mb.show();
+            mainButton.setParams({ text: "Сканировать", color: "#30d158", textColor: "#ffffff" });
+            mainButton.on('click', this._mainHandler);
+            mainButton.show();
 
             if (this.scannedItems.length > 0) {
-              sb.setText("Очистить");
-              sb.color = "#0A0A0A";
-              sb.textColor = "#ff453a";
-              sb.position = "bottom";
-              sb.onClick(this._secondaryHandler);
-              sb.show();
+              secondaryButton.setParams({ text: "Очистить", color: "#0A0A0A", textColor: "#ff453a" });
+              secondaryButton.on('click', this._secondaryHandler);
+              secondaryButton.show();
             } else {
-              sb.hide();
+              secondaryButton.hide();
             }
           },
 
@@ -604,7 +515,6 @@
 
             this.isScanning = true;
             this.permissionError = false;
-            this._scanStartTime = Date.now();
             TelegramApp.haptic("light");
 
             TelegramApp.scanQr(
@@ -614,11 +524,16 @@
 
                 if (!code) {
                   this.showToast("Неверный формат кода", "error");
-                  return true;
+                  return false;
                 }
 
                 if (this.scannedCodes[code]) {
-                  this.showToast("Этот код уже отсканирован", "warning");
+                  TelegramApp.closeScanQr();
+                  this.isScanning = false;
+                  this.$nextTick(() => {
+                    this.showToast("Этот код уже отсканирован", "warning");
+                  });
+                  TelegramApp.haptic("light");
                   return true;
                 }
 
@@ -648,9 +563,6 @@
               },
               () => {
                 this.isScanning = false;
-                if (Date.now() - this._scanStartTime < 1000) {
-                  this.permissionError = true;
-                }
               },
             );
           },

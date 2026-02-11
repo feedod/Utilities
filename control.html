@@ -121,6 +121,7 @@
         border: 0.5px solid rgba(255, 255, 255, 0.08);
         border-radius: 16px;
         overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       }
 
       .code-display {
@@ -151,12 +152,13 @@
     class="flex min-h-dvh flex-col select-none bg-bg text-text antialiased"
     aria-label="Scanner Application"
   >
-    <main class="mx-auto flex w-full max-w-lg flex-1 flex-col">
-      <header class="fade-in px-5 pb-2 pt-6 text-center">
-        <h1 class="text-2xl font-bold tracking-tight text-text">Control</h1>
-      </header>
+    <header class="fixed top-0 left-0 right-0 z-10 fade-in bg-bg px-5 pb-2 pt-6 text-center">
+      <h1 class="text-2xl font-bold tracking-tight text-text">Control</h1>
+      <p class="text-sm text-muted">Сканер QR-кодов</p>
+    </header>
 
-      <section class="flex-1 px-4 pb-10 pt-5">
+    <main class="mx-auto flex w-full max-w-lg flex-1 flex-col pt-20">
+      <section class="flex-1 px-4 pb-10">
         <template x-if="scannedItems.length === 0">
           <div class="fade-in flex flex-col items-center">
             <div
@@ -376,14 +378,17 @@
           if (!tg) return;
           try {
             tg.ready();
-            tg.requestFullscreen?.();
-            tg.disableVerticalSwipes?.();
-            tg.setHeaderColor?.("#000000");
-            tg.setBackgroundColor?.("#000000");
-            tg.setBottomBarColor?.("#0A0A0A");
-          } catch (e) {
-            console.warn("[TG] init error:", e);
-          }
+            tg.expand();
+            tg.enableClosingConfirmation();
+            tg.disableVerticalSwipes();
+            tg.setHeaderColor("#000000");
+            tg.setBackgroundColor("#000000");
+            tg.setBottomBarColor("#0A0A0A");
+            tg.BackButton.hide();
+            tg.SettingsButton.hide();
+            tg.MainButton.showProgress(false);
+            tg.SecondaryButton.showProgress(false);
+          } catch (e) {}
         },
 
         haptic(style = "light") {
@@ -406,6 +411,24 @@
             }
           } catch {}
           cb(confirm(msg));
+        },
+
+        alert(msg) {
+          try {
+            if (typeof this.tg?.showAlert === "function") {
+              this.tg.showAlert(msg);
+              return;
+            }
+          } catch {}
+          alert(msg);
+        },
+
+        popup(params) {
+          try {
+            if (typeof this.tg?.showPopup === "function") {
+              this.tg.showPopup(params);
+            }
+          } catch {}
         },
 
         closeScanQr() {
@@ -465,6 +488,28 @@
             });
           });
         },
+
+        async cloudGetKeys() {
+          const tg = this.tg;
+          if (!tg?.CloudStorage) throw new Error("CloudStorage unavailable");
+          return new Promise((resolve, reject) => {
+            tg.CloudStorage.getKeys((err, keys) => {
+              if (err) reject(new Error(err));
+              else resolve(keys);
+            });
+          });
+        },
+
+        async cloudRemove(key) {
+          const tg = this.tg;
+          if (!tg?.CloudStorage) throw new Error("CloudStorage unavailable");
+          return new Promise((resolve, reject) => {
+            tg.CloudStorage.removeItem(key, (err, success) => {
+              if (err) reject(new Error(err));
+              else resolve(success);
+            });
+          });
+        },
       };
 
       const AudioManager = {
@@ -515,6 +560,7 @@
           _toastTimer: null,
           _mainHandler: null,
           _secondaryHandler: null,
+          _scanStartTime: 0,
 
           async init() {
             TelegramApp.init();
@@ -540,7 +586,7 @@
             this._mainHandler = () => this.scan();
             this._secondaryHandler = () => this.confirmClearAll();
 
-            mb.setText("Сканировать");
+            mb.setText("Сканировать QR");
             mb.color = "#30d158";
             mb.textColor = "#ffffff";
             mb.onClick(this._mainHandler);
@@ -563,6 +609,7 @@
 
             this.isScanning = true;
             this.permissionError = false;
+            this._scanStartTime = Date.now();
             TelegramApp.haptic("light");
 
             TelegramApp.scanQr(
@@ -572,16 +619,11 @@
 
                 if (!code) {
                   this.showToast("Неверный формат кода", "error");
-                  return false;
+                  return true;
                 }
 
                 if (this.scannedCodes[code]) {
-                  TelegramApp.closeScanQr();
-                  this.isScanning = false;
-                  this.$nextTick(() => {
-                    this.showToast("Этот код уже отсканирован", "warning");
-                  });
-                  TelegramApp.haptic("light");
+                  this.showToast("Этот код уже отсканирован", "warning");
                   return true;
                 }
 
@@ -611,7 +653,9 @@
               },
               () => {
                 this.isScanning = false;
-                // this.permissionError = true;
+                if (Date.now() - this._scanStartTime < 1000) {
+                  this.permissionError = true;
+                }
               },
             );
           },

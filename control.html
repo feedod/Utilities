@@ -9,7 +9,6 @@
     <meta name="color-scheme" content="dark" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://unpkg.com/qr-code-styling@1.5.0/lib/qr-code-styling.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
     <style type="text/tailwindcss">
       @theme {
@@ -138,19 +137,6 @@
         border: 1px solid rgba(255, 69, 58, 0.3);
       }
 
-      .qr-container {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-      }
-
-      .qr-container canvas,
-      .qr-container svg {
-        display: block;
-        max-width: 260px;
-        height: auto;
-      }
-
       .barcode-container svg {
         width: 100% !important;
         height: auto !important;
@@ -162,7 +148,8 @@
   <body
     x-cloak
     x-data="ScannerApp"
-    class="flex min-h-dvh flex-col select-none bg-bg text-text"
+    class="flex min-h-dvh flex-col select-none bg-bg text-text antialiased"
+    aria-label="Scanner Application"
   >
     <main class="mx-auto flex w-full max-w-lg flex-1 flex-col">
       <header class="fade-in px-5 pb-2 pt-6 text-center">
@@ -174,6 +161,8 @@
           <div class="fade-in flex flex-col items-center">
             <div
               class="mb-6 w-full rounded-2xl border border-border bg-surface p-8 text-center"
+              role="alert"
+              aria-live="polite"
             >
               <div
                 class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-elevated"
@@ -184,6 +173,7 @@
                   stroke="currentColor"
                   stroke-width="1.5"
                   viewBox="0 0 24 24"
+                  aria-hidden="true"
                 >
                   <path
                     stroke-linecap="round"
@@ -201,7 +191,7 @@
                 Начните сканирование
               </p>
               <p class="mt-1 text-sm text-muted">
-                Нажмите кнопку ниже для открытия сканера
+                Нажмите кнопку внизу, чтобы открыть сканер
               </p>
             </div>
 
@@ -209,6 +199,8 @@
               x-show="permissionError"
               x-transition
               class="error-banner w-full rounded-2xl p-4"
+              role="alert"
+              aria-live="assertive"
             >
               <div class="flex items-start gap-3">
                 <div
@@ -220,6 +212,7 @@
                     stroke="currentColor"
                     stroke-width="2"
                     viewBox="0 0 24 24"
+                    aria-hidden="true"
                   >
                     <path
                       stroke-linecap="round"
@@ -231,7 +224,7 @@
                 <div>
                   <p class="text-sm font-semibold text-error">Ошибка сканера</p>
                   <p class="mt-1 text-xs leading-relaxed text-muted">
-                    Разрешите доступ к камере или обновите Telegram
+                    Предоставьте доступ к камере или обновите приложение Telegram
                   </p>
                 </div>
               </div>
@@ -252,17 +245,21 @@
               <template x-for="item in scannedItems" :key="item.id">
                 <div
                   class="product-card slide-up"
-                  x-init="$nextTick(() => renderCodes(item))"
+                  x-init="$nextTick(() => renderBarcode(item))"
+                  role="region"
+                  aria-label="Scanned Item"
                 >
                   <div class="flex items-center justify-between p-4 pb-3">
                     <p
                       class="code-display cursor-pointer truncate text-base font-bold text-text"
                       x-text="item.code"
                       @click="copyCode(item.code)"
+                      aria-label="Copy code"
                     ></p>
                     <button
                       @click="removeItem(item.id)"
                       class="ml-3 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-surface-elevated transition-all active:scale-90"
+                      aria-label="Remove item"
                     >
                       <svg
                         class="h-[18px] w-[18px] text-error/70"
@@ -270,6 +267,7 @@
                         stroke="currentColor"
                         stroke-width="1.5"
                         viewBox="0 0 24 24"
+                        aria-hidden="true"
                       >
                         <path
                           stroke-linecap="round"
@@ -280,15 +278,11 @@
                     </button>
                   </div>
 
-                  <div class="bg-white">
-                    <div :id="'qr_' + item.id" class="qr-container p-4"></div>
-                  </div>
-
                   <div class="bg-white mt-px">
                     <div
                       class="barcode-container flex items-center justify-center p-3"
                     >
-                      <svg :id="'bar_' + item.id"></svg>
+                      <svg :id="'bar_' + item.id" aria-hidden="true"></svg>
                     </div>
                   </div>
                 </div>
@@ -307,7 +301,9 @@
       x-transition:leave="transition ease-in duration-150"
       x-transition:leave-start="opacity-100 translate-y-0"
       x-transition:leave-end="opacity-0 translate-y-4"
-      class="glass fixed bottom-32 left-1/2 z-50 -translate-x-1/2 rounded-full px-5 py-3"
+      class="glass fixed bottom-32 left-1/2 z-50 -translate-x-1/2 rounded-full px-5 py-3 shadow-lg"
+      role="status"
+      aria-live="polite"
     >
       <div class="flex items-center gap-2.5 whitespace-nowrap">
         <template x-if="toast.type === 'success'">
@@ -317,6 +313,7 @@
             stroke="currentColor"
             stroke-width="2"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -332,6 +329,7 @@
             stroke="currentColor"
             stroke-width="2"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -347,6 +345,7 @@
             stroke="currentColor"
             stroke-width="2"
             viewBox="0 0 24 24"
+            aria-hidden="true"
           >
             <path
               stroke-linecap="round"
@@ -377,11 +376,10 @@
           if (!tg) return;
           try {
             tg.ready();
-            tg.requestFullscreen?.();
-            tg.disableVerticalSwipes?.();
-            tg.setHeaderColor?.("#000000");
-            tg.setBackgroundColor?.("#000000");
-            tg.setBottomBarColor?.("#0A0A0A");
+            tg.expand();
+            tg.enableClosingConfirmation();
+            tg.setHeaderColor("#000000");
+            tg.setBackgroundColor("#000000");
           } catch (e) {
             console.warn("[TG] init error:", e);
           }
@@ -439,9 +437,7 @@
             if (shouldClose) {
               closed = true;
               tg.offEvent("scanQrPopupClosed", handleClose);
-              try {
-                tg.closeScanQrPopup();
-              } catch {}
+              this.closeScanQr();
             }
             return shouldClose;
           });
@@ -522,7 +518,7 @@
           async init() {
             TelegramApp.init();
             AudioManager.init();
-            await this.loadHistory();
+            await this.loadHistory().catch(() => this.showToast("Ошибка загрузки истории", "error"));
             this.setupButtons();
           },
 
@@ -543,7 +539,7 @@
             this._mainHandler = () => this.scan();
             this._secondaryHandler = () => this.confirmClearAll();
 
-            mb.setText("Сканирование");
+            mb.setText("Сканировать");
             mb.color = "#30d158";
             mb.textColor = "#ffffff";
             mb.onClick(this._mainHandler);
@@ -569,17 +565,20 @@
             TelegramApp.haptic("light");
 
             TelegramApp.scanQr(
-              "Наведите на QR-код",
+              "Наведите камеру на штрихкод",
               (result) => {
                 const code = this.extractCode(result);
 
-                if (!code) return false;
+                if (!code) {
+                  this.showToast("Неверный формат кода", "error");
+                  return false;
+                }
 
                 if (this.scannedCodes[code]) {
                   TelegramApp.closeScanQr();
                   this.isScanning = false;
                   this.$nextTick(() => {
-                    this.showToast("Уже отсканировано", "warning");
+                    this.showToast("Этот код уже отсканирован", "warning");
                   });
                   TelegramApp.haptic("light");
                   return true;
@@ -595,13 +594,13 @@
                 };
 
                 this.scannedItems.unshift(item);
-                this.saveHistory();
+                this.saveHistory().catch(() => this.showToast("Ошибка сохранения", "error"));
 
                 TelegramApp.notify("success");
                 AudioManager.playSuccess();
 
                 this.$nextTick(() => {
-                  this.renderCodes(item);
+                  this.renderBarcode(item);
                 });
 
                 this.isScanning = false;
@@ -611,44 +610,9 @@
               },
               () => {
                 this.isScanning = false;
+                this.permissionError = true;
               },
             );
-          },
-
-          renderCodes(item) {
-            this.renderQR(item);
-            this.renderBarcode(item);
-          },
-
-          renderQR(item) {
-            const el = document.getElementById(`qr_${item.id}`);
-            if (!el) return;
-
-            el.innerHTML = "";
-
-            try {
-              const qr = new QRCodeStyling({
-                width: 260,
-                height: 260,
-                type: "svg",
-                data: item.code,
-                margin: 0,
-                qrOptions: {
-                  typeNumber: 0,
-                  mode: "Byte",
-                  errorCorrectionLevel: "Q",
-                },
-                dotsOptions: { type: "square", color: "#000000" },
-                backgroundOptions: { color: "#ffffff" },
-                cornersSquareOptions: { type: "square", color: "#000000" },
-                cornersDotOptions: { type: "dot", color: "#000000" },
-              });
-
-              qr.append(el);
-            } catch {
-              el.innerHTML =
-                '<p class="text-xs text-neutral-400 py-4 text-center">QR ошибка</p>';
-            }
           },
 
           renderBarcode(item) {
@@ -671,11 +635,13 @@
                 margin: 4,
                 flat: true,
               });
-            } catch {
+            } catch (e) {
+              console.warn("[Barcode] Render error:", e);
               if (el.parentNode) {
                 el.parentNode.innerHTML =
-                  '<p class="text-xs text-neutral-400 py-4 text-center">Штрихкод недоступен</p>';
+                  '<p class="text-xs text-neutral-400 py-4 text-center">Ошибка штрихкода</p>';
               }
+              this.showToast("Ошибка генерации штрихкода", "error");
             }
           },
 
@@ -705,15 +671,11 @@
             TelegramApp.haptic("light");
 
             try {
-              if (navigator.clipboard?.writeText) {
-                await navigator.clipboard.writeText(code);
-              } else {
-                throw new Error("Clipboard API unavailable");
-              }
-              this.showToast("Скопировано", "success");
+              await navigator.clipboard.writeText(code);
+              this.showToast("Код скопирован", "success");
               TelegramApp.notify("success");
             } catch {
-              this.showToast("Ошибка копирования", "error");
+              this.showToast("Ошибка копирования кода", "error");
             }
           },
 
@@ -722,18 +684,18 @@
             const item = this.scannedItems.find((i) => i.id === id);
             if (item) delete this.scannedCodes[item.code];
             this.scannedItems = this.scannedItems.filter((i) => i.id !== id);
-            this.saveHistory();
+            this.saveHistory().catch(() => this.showToast("Ошибка сохранения", "error"));
             this.setupButtons();
           },
 
           confirmClearAll() {
             TelegramApp.haptic("medium");
-            TelegramApp.confirm("Очистить всю историю сканирований?", (ok) => {
+            TelegramApp.confirm("Очистить всю историю сканирования?", (ok) => {
               if (ok) {
                 this.scannedItems = [];
                 this.scannedCodes = {};
                 this.idCounter = 0;
-                this.saveHistory();
+                this.saveHistory().catch(() => this.showToast("Ошибка сохранения", "error"));
                 TelegramApp.notify("success");
                 this.setupButtons();
               }
@@ -749,41 +711,33 @@
           },
 
           async saveHistory() {
-            try {
-              const data = JSON.stringify({
-                items: this.scannedItems,
-                counter: this.idCounter,
-              });
-              await TelegramApp.cloudSet("ean_history", data);
-            } catch {}
+            const data = JSON.stringify({
+              items: this.scannedItems,
+              counter: this.idCounter,
+            });
+            await TelegramApp.cloudSet("ean_history", data);
           },
 
           async loadHistory() {
-            try {
-              const raw = await TelegramApp.cloudGet("ean_history");
-              if (!raw) return;
-              const data = JSON.parse(raw);
-              if (data?.items && Array.isArray(data.items)) {
-                this.scannedItems = data.items;
-                this.idCounter = data.counter ?? data.items.length;
-                this.scannedCodes = Object.fromEntries(
-                  data.items.map((i) => [i.code, true]),
-                );
+            const raw = await TelegramApp.cloudGet("ean_history");
+            if (!raw) return;
+            const data = JSON.parse(raw);
+            if (data?.items && Array.isArray(data.items)) {
+              this.scannedItems = data.items;
+              this.idCounter = data.counter ?? data.items.length;
+              this.scannedCodes = Object.fromEntries(
+                data.items.map((i) => [i.code, true]),
+              );
 
-                if (this.scannedItems.length > 0) {
-                  this.$nextTick(() => {
-                    requestAnimationFrame(() => {
-                      this.scannedItems.forEach((item) =>
-                        this.renderCodes(item),
-                      );
-                    });
+              if (this.scannedItems.length > 0) {
+                this.$nextTick(() => {
+                  requestAnimationFrame(() => {
+                    this.scannedItems.forEach((item) =>
+                      this.renderBarcode(item),
+                    );
                   });
-                }
+                });
               }
-            } catch {
-              this.scannedItems = [];
-              this.scannedCodes = {};
-              this.idCounter = 0;
             }
           },
         }));

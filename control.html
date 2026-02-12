@@ -341,10 +341,11 @@
           if (!tg) return;
           try {
             tg.ready();
-            tg.expand();
+            tg.requestFullscreen?.();
             tg.disableVerticalSwipes?.();
             tg.setHeaderColor?.("#000000");
             tg.setBackgroundColor?.("#000000");
+            tg.setBottomBarColor?.("#0A0A0A");
           } catch (e) {
             console.warn("[TG] init error:", e);
           }

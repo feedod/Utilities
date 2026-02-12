@@ -6,6 +6,7 @@
   <meta name="color-scheme" content="dark">
   
   <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   
   <style type="text/tailwindcss">
     @theme {
@@ -161,16 +162,6 @@
       .animate-slide { animation: slide-up 400ms var(--ease-out-expo) forwards; }
     }
   </style>
-
-  <script type="importmap">
-    {
-      "imports": {
-        "alpinejs": "https://esm.run/alpinejs@3",
-        "jsbarcode": "https://esm.run/jsbarcode@3",
-        "@tma.js/sdk": "https://esm.run/@tma.js/sdk@3"
-      }
-    }
-  </script>
 </head>
 
 <body x-cloak x-data="app" class="flex flex-col select-none">
@@ -276,75 +267,39 @@
     </div>
   </div>
 
-  <script type="module">
-    import Alpine from 'alpinejs';
-    import JsBarcode from 'jsbarcode';
-    import * as TMA from '@tma.js/sdk';
-
+  <script src="https://cdn.jsdelivr.net/npm/alpinejs@3/dist/cdn.min.js" defer></script>
+  <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3/dist/JsBarcode.all.min.js"></script>
+  
+  <script>
     const STORAGE_KEY = 'scanner_v1';
     const EAN13 = /^\d{13}$/;
     const EAN8 = /^\d{8}$/;
 
-    let tg = null;
-    let mainBtn = null;
-    let secondaryBtn = null;
-    let haptic = null;
-    let cloud = null;
-    let popup = null;
-    let qrScanner = null;
+    // Telegram WebApp
+    const tg = window.Telegram?.WebApp;
 
-    const initTMA = async () => {
+    const initTMA = () => {
+      if (!tg) {
+        console.warn('Telegram WebApp not available');
+        return false;
+      }
+
       try {
-        const [isTMA] = TMA.isTMA('simple');
-        if (!isTMA) return false;
-
-        await TMA.init();
-
-        if (TMA.backButton.mount.isAvailable()) TMA.backButton.mount();
-        if (TMA.miniApp.mount.isAvailable()) TMA.miniApp.mount();
-        if (TMA.themeParams.mount.isAvailable()) TMA.themeParams.mount();
-        if (TMA.viewport.mount.isAvailable()) {
-          TMA.viewport.mount();
-          TMA.viewport.expand();
-          if (TMA.viewport.requestFullscreen.isAvailable()) {
-            TMA.viewport.requestFullscreen();
-          }
+        tg.ready();
+        tg.expand();
+        
+        // Настройка цветов
+        tg.setHeaderColor('#000000');
+        tg.setBackgroundColor('#000000');
+        
+        // Включить подтверждение закрытия
+        tg.enableClosingConfirmation();
+        
+        // Отключить вертикальный свайп (если доступно)
+        if (tg.disableVerticalSwipes) {
+          tg.disableVerticalSwipes();
         }
 
-        if (TMA.swipeBehavior.mount.isAvailable()) {
-          TMA.swipeBehavior.mount();
-          if (TMA.swipeBehavior.disableVertical.isAvailable()) {
-            TMA.swipeBehavior.disableVertical();
-          }
-        }
-
-        if (TMA.closingBehavior.mount.isAvailable()) {
-          TMA.closingBehavior.mount();
-          if (TMA.closingBehavior.enableConfirmation.isAvailable()) {
-            TMA.closingBehavior.enableConfirmation();
-          }
-        }
-
-        if (TMA.miniApp.setHeaderColor.isAvailable()) TMA.miniApp.setHeaderColor('#000000');
-        if (TMA.miniApp.setBgColor.isAvailable()) TMA.miniApp.setBgColor('#000000');
-        if (TMA.miniApp.setBottomBarColor.isAvailable()) TMA.miniApp.setBottomBarColor('#0a0a0a');
-
-        if (TMA.mainButton.mount.isAvailable()) {
-          TMA.mainButton.mount();
-          mainBtn = TMA.mainButton;
-        }
-
-        if (TMA.secondaryButton.mount.isAvailable()) {
-          TMA.secondaryButton.mount();
-          secondaryBtn = TMA.secondaryButton;
-        }
-
-        haptic = TMA.hapticFeedback;
-        cloud = TMA.cloudStorage;
-        popup = TMA.popup;
-        qrScanner = TMA.qrScanner;
-
-        TMA.miniApp.ready();
         return true;
       } catch (e) {
         console.warn('TMA init failed:', e);
@@ -353,53 +308,47 @@
     };
 
     const doHaptic = (type = 'light') => {
-      if (haptic?.impactOccurred?.isAvailable?.()) {
-        haptic.impactOccurred(type);
-      }
+      try {
+        tg?.HapticFeedback?.impactOccurred?.(type);
+      } catch {}
     };
 
     const doNotify = (type = 'success') => {
-      if (haptic?.notificationOccurred?.isAvailable?.()) {
-        haptic.notificationOccurred(type);
-      }
+      try {
+        tg?.HapticFeedback?.notificationOccurred?.(type);
+      } catch {}
     };
 
     const cloudGet = async (key) => {
-      if (!cloud?.get?.isAvailable?.()) return null;
-      const result = await cloud.get(key);
-      return result?.[key] ?? null;
-    };
-
-    const cloudSet = async (key, value) => {
-      if (!cloud?.set?.isAvailable?.()) return;
-      await cloud.set(key, value);
-    };
-
-    const showConfirm = async (message) => {
-      if (popup?.open?.isAvailable?.()) {
-        const result = await popup.open({ message, buttons: [{ id: 'ok', type: 'destructive', text: 'Да' }, { id: 'cancel', type: 'cancel' }] });
-        return result === 'ok';
-      }
-      return confirm(message);
-    };
-
-    const openScanner = (onResult, onClose) => {
-      if (!qrScanner?.open?.isAvailable?.()) {
-        onClose?.();
-        return;
-      }
-
-      const off = qrScanner.open('Наведите камеру на штрих-код').then(result => {
-        onResult?.(result);
-      }).catch(() => {}).finally(() => {
-        onClose?.();
+      return new Promise((resolve) => {
+        if (!tg?.CloudStorage) {
+          resolve(null);
+          return;
+        }
+        tg.CloudStorage.getItem(key, (err, value) => {
+          resolve(err ? null : value);
+        });
       });
     };
 
-    const closeScanner = () => {
-      if (qrScanner?.close?.isAvailable?.()) {
-        qrScanner.close();
-      }
+    const cloudSet = async (key, value) => {
+      return new Promise((resolve) => {
+        if (!tg?.CloudStorage) {
+          resolve();
+          return;
+        }
+        tg.CloudStorage.setItem(key, value, () => resolve());
+      });
+    };
+
+    const showConfirm = (message) => {
+      return new Promise((resolve) => {
+        if (tg?.showConfirm) {
+          tg.showConfirm(message, resolve);
+        } else {
+          resolve(confirm(message));
+        }
+      });
     };
 
     const extractCode = (text) => {
@@ -445,177 +394,196 @@
       };
     })();
 
-    Alpine.data('app', () => ({
-      loading: true,
-      scanning: false,
-      items: [],
-      codes: new Map(),
-      counter: 0,
-      toast: { show: false, msg: '', type: 'success' },
-      _toastTimer: null,
+    document.addEventListener('alpine:init', () => {
+      Alpine.data('app', () => ({
+        loading: true,
+        scanning: false,
+        items: [],
+        codes: new Map(),
+        counter: 0,
+        toast: { show: false, msg: '', type: 'success' },
+        _toastTimer: null,
 
-      async init() {
-        await initTMA();
-        await this.load();
-        this.loading = false;
-        this.setupButtons();
-        this.$watch('items.length', () => this.updateSecondary());
-      },
+        async init() {
+          initTMA();
+          await this.load();
+          this.loading = false;
+          this.setupButtons();
+          this.$watch('items.length', () => this.updateSecondary());
+        },
 
-      setupButtons() {
-        if (mainBtn) {
-          mainBtn.setParams({ text: 'Сканировать', bgColor: '#30d158', textColor: '#ffffff', isVisible: true, isEnabled: true });
-          mainBtn.onClick(() => this.scan());
-        }
-        if (secondaryBtn) {
-          secondaryBtn.setParams({ text: 'Очистить всё', bgColor: '#0a0a0a', textColor: '#ff453a', position: 'bottom', isVisible: false, isEnabled: true });
-          secondaryBtn.onClick(() => this.confirmClear());
-        }
-        this.updateSecondary();
-      },
-
-      updateSecondary() {
-        if (!secondaryBtn) return;
-        if (this.items.length > 0) {
-          secondaryBtn.setParams({ isVisible: true });
-        } else {
-          secondaryBtn.setParams({ isVisible: false });
-        }
-      },
-
-      scan() {
-        if (this.scanning) return;
-        this.scanning = true;
-        doHaptic('light');
-
-        openScanner(
-          (result) => {
-            this.handleResult(result);
-          },
-          () => {
-            this.scanning = false;
-          }
-        );
-      },
-
-      handleResult(result) {
-        const code = extractCode(result);
-
-        if (!code) {
-          closeScanner();
-          this.scanning = false;
-          this.notify('Неверный формат кода', 'error');
-          doNotify('error');
-          return;
-        }
-
-        if (this.codes.has(code)) {
-          closeScanner();
-          this.scanning = false;
-          this.notify('Этот код уже отсканирован', 'warning');
-          doNotify('warning');
-          return;
-        }
-
-        this.add(code);
-        doNotify('success');
-        audioCtx.playSuccess();
-        closeScanner();
-        this.scanning = false;
-      },
-
-      add(code) {
-        this.counter++;
-        const item = { id: this.counter, code, ts: Date.now() };
-        this.codes.set(code, true);
-        this.items.unshift(item);
-        this.$nextTick(() => this.renderBarcode(item));
-        this.save();
-      },
-
-      renderBarcode(item) {
-        const el = document.getElementById(`bc-${item.id}`);
-        if (!el) return;
-        try {
-          JsBarcode(el, item.code, {
-            format: item.code.length === 8 ? 'ean8' : 'ean13',
-            lineColor: '#000',
-            background: 'transparent',
-            width: 1.5,
-            height: 60,
-            displayValue: false,
-            margin: 8,
-            flat: true
+        setupButtons() {
+          if (!tg) return;
+          
+          // Main Button
+          tg.MainButton.setText('Сканировать');
+          tg.MainButton.setParams({
+            color: '#30d158',
+            text_color: '#ffffff'
           });
-        } catch {
-          el.parentNode.innerHTML = '<p class="py-4 text-center text-xs text-text-muted">Ошибка штрих-кода</p>';
-        }
-      },
+          tg.MainButton.show();
+          tg.MainButton.onClick(() => this.scan());
 
-      async copy(code) {
-        doHaptic('light');
-        try {
-          await navigator.clipboard.writeText(code);
-          this.notify('Код скопирован', 'success');
-          doNotify('success');
-        } catch {
-          this.notify('Ошибка копирования', 'error');
-        }
-      },
-
-      remove(id) {
-        doHaptic('medium');
-        const item = this.items.find(i => i.id === id);
-        if (item) this.codes.delete(item.code);
-        this.items = this.items.filter(i => i.id !== id);
-        this.save();
-      },
-
-      async confirmClear() {
-        doHaptic('medium');
-        const ok = await showConfirm('Очистить всю историю?');
-        if (ok) {
-          this.items = [];
-          this.codes.clear();
-          this.counter = 0;
-          this.save();
-          doNotify('success');
-        }
-      },
-
-      notify(msg, type = 'success') {
-        if (this._toastTimer) clearTimeout(this._toastTimer);
-        this.toast = { show: true, msg, type };
-        this._toastTimer = setTimeout(() => { this.toast.show = false; }, 2000);
-      },
-
-      async save() {
-        const data = JSON.stringify({ items: this.items, counter: this.counter });
-        await cloudSet(STORAGE_KEY, data);
-      },
-
-      async load() {
-        const raw = await cloudGet(STORAGE_KEY);
-        if (!raw) return;
-        try {
-          const data = JSON.parse(raw);
-          if (Array.isArray(data.items)) {
-            this.items = data.items;
-            this.counter = data.counter ?? data.items.length;
-            this.codes = new Map(data.items.map(i => [i.code, true]));
-            this.$nextTick(() => {
-              requestAnimationFrame(() => {
-                this.items.forEach(item => this.renderBarcode(item));
-              });
+          // Secondary Button (если доступна)
+          if (tg.SecondaryButton) {
+            tg.SecondaryButton.setText('Очистить всё');
+            tg.SecondaryButton.setParams({
+              color: '#0a0a0a',
+              text_color: '#ff453a'
             });
+            tg.SecondaryButton.onClick(() => this.confirmClear());
           }
-        } catch {
-          this.notify('Ошибка загрузки данных', 'error');
-        }
-      }
-    }));
+          
+          this.updateSecondary();
+        },
 
-    Alpine.start();
+        updateSecondary() {
+          if (!tg?.SecondaryButton) return;
+          if (this.items.length > 0) {
+            tg.SecondaryButton.show();
+          } else {
+            tg.SecondaryButton.hide();
+          }
+        },
+
+        scan() {
+          if (this.scanning) return;
+          this.scanning = true;
+          doHaptic('light');
+
+          if (!tg?.showScanQrPopup) {
+            this.notify('QR сканер недоступен', 'error');
+            this.scanning = false;
+            return;
+          }
+
+          tg.showScanQrPopup({ text: 'Наведите камеру на штрих-код' }, (result) => {
+            if (result) {
+              const handled = this.handleResult(result);
+              if (handled) {
+                tg.closeScanQrPopup();
+                return true; // Закрыть сканер
+              }
+              return false; // Продолжить сканирование
+            }
+            this.scanning = false;
+            return true;
+          });
+        },
+
+        handleResult(result) {
+          const code = extractCode(result);
+
+          if (!code) {
+            this.notify('Неверный формат кода', 'error');
+            doNotify('error');
+            return false; // Продолжить сканирование
+          }
+
+          if (this.codes.has(code)) {
+            this.notify('Этот код уже отсканирован', 'warning');
+            doNotify('warning');
+            return true; // Закрыть сканер
+          }
+
+          this.add(code);
+          doNotify('success');
+          audioCtx.playSuccess();
+          this.scanning = false;
+          return true; // Закрыть сканер
+        },
+
+        add(code) {
+          this.counter++;
+          const item = { id: this.counter, code, ts: Date.now() };
+          this.codes.set(code, true);
+          this.items.unshift(item);
+          this.$nextTick(() => this.renderBarcode(item));
+          this.save();
+        },
+
+        renderBarcode(item) {
+          const el = document.getElementById(`bc-${item.id}`);
+          if (!el) return;
+          try {
+            JsBarcode(el, item.code, {
+              format: item.code.length === 8 ? 'ean8' : 'ean13',
+              lineColor: '#000',
+              background: 'transparent',
+              width: 1.5,
+              height: 60,
+              displayValue: false,
+              margin: 8,
+              flat: true
+            });
+          } catch {
+            el.parentNode.innerHTML = '<p class="py-4 text-center text-xs text-text-muted">Ошибка штрих-кода</p>';
+          }
+        },
+
+        async copy(code) {
+          doHaptic('light');
+          try {
+            await navigator.clipboard.writeText(code);
+            this.notify('Код скопирован', 'success');
+            doNotify('success');
+          } catch {
+            this.notify('Ошибка копирования', 'error');
+          }
+        },
+
+        remove(id) {
+          doHaptic('medium');
+          const item = this.items.find(i => i.id === id);
+          if (item) this.codes.delete(item.code);
+          this.items = this.items.filter(i => i.id !== id);
+          this.save();
+        },
+
+        async confirmClear() {
+          doHaptic('medium');
+          const ok = await showConfirm('Очистить всю историю?');
+          if (ok) {
+            this.items = [];
+            this.codes.clear();
+            this.counter = 0;
+            this.save();
+            doNotify('success');
+          }
+        },
+
+        notify(msg, type = 'success') {
+          if (this._toastTimer) clearTimeout(this._toastTimer);
+          this.toast = { show: true, msg, type };
+          this._toastTimer = setTimeout(() => { this.toast.show = false; }, 2000);
+        },
+
+        async save() {
+          const data = JSON.stringify({ items: this.items, counter: this.counter });
+          await cloudSet(STORAGE_KEY, data);
+        },
+
+        async load() {
+          const raw = await cloudGet(STORAGE_KEY);
+          if (!raw) return;
+          try {
+            const data = JSON.parse(raw);
+            if (Array.isArray(data.items)) {
+              this.items = data.items;
+              this.counter = data.counter ?? data.items.length;
+              this.codes = new Map(data.items.map(i => [i.code, true]));
+              this.$nextTick(() => {
+                requestAnimationFrame(() => {
+                  this.items.forEach(item => this.renderBarcode(item));
+                });
+              });
+            }
+          } catch {
+            this.notify('Ошибка загрузки данных', 'error');
+          }
+        }
+      }));
+    });
   </script>
 </body>
 </html>

@@ -1,720 +1,621 @@
 <!DOCTYPE html>
-<html lang="ru">
-  <head>
-    <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
-    />
-    <meta name="color-scheme" content="dark" />
-    <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jsbarcode@3.11.6/dist/JsBarcode.all.min.js"></script>
-    <style type="text/tailwindcss">
-      @theme {
-        --color-bg: #000000;
-        --color-surface: #1c1c1e;
-        --color-surface-elevated: #2c2c2e;
-        --color-surface-tertiary: #3a3a3c;
-        --color-border: #38383a;
-        --color-text: #ffffff;
-        --color-text-secondary: #ebebf5;
-        --color-muted: #8e8e93;
-        --color-success: #30d158;
-        --color-error: #ff453a;
-        --color-warning: #ff9f0a;
-        --color-accent: #0a84ff;
-        --color-tint: #64d2ff;
-      }
+<html lang="ru" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="color-scheme" content="dark">
+  
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  
+  <style type="text/tailwindcss">
+    @theme {
+      --color-bg: oklch(0% 0 0);
+      --color-surface: oklch(15% 0.005 285);
+      --color-surface-elevated: oklch(22% 0.005 285);
+      --color-surface-tertiary: oklch(28% 0.005 285);
+      --color-border: oklch(30% 0.01 285 / 0.5);
+      --color-separator: oklch(40% 0.01 285 / 0.3);
+      --color-text-primary: oklch(100% 0 0);
+      --color-text-secondary: oklch(92% 0.01 285);
+      --color-text-tertiary: oklch(65% 0.02 285);
+      --color-text-muted: oklch(55% 0.02 285);
+      --color-success: oklch(72% 0.19 145);
+      --color-error: oklch(65% 0.25 25);
+      --color-warning: oklch(78% 0.18 70);
+      --color-accent: oklch(65% 0.22 255);
+      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --ease-spring: cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
 
-      * {
-        -webkit-tap-highlight-color: transparent;
-        -webkit-touch-callout: none;
+    @layer base {
+      *, *::before, *::after {
         box-sizing: border-box;
-      }
-
-      html,
-      body {
-        background: var(--color-bg);
-        font-family:
-          -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-          system-ui, sans-serif;
-        overscroll-behavior: none;
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        scrollbar-width: none;
         margin: 0;
         padding: 0;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
       }
 
-      html::-webkit-scrollbar,
-      body::-webkit-scrollbar,
-      *::-webkit-scrollbar {
-        display: none;
+      html, body {
+        background: var(--color-bg);
+        color: var(--color-text-primary);
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", system-ui, sans-serif;
+        -webkit-font-smoothing: antialiased;
+        overscroll-behavior: none;
+        overflow-x: hidden;
+        scrollbar-width: none;
       }
+
+      ::-webkit-scrollbar { display: none; }
 
       body {
-        padding-top: calc(env(safe-area-inset-top) + 8px);
-        padding-right: calc(env(safe-area-inset-right) + 4px);
-        padding-bottom: calc(env(safe-area-inset-bottom) + 120px);
-        padding-left: calc(env(safe-area-inset-left) + 4px);
+        min-height: 100dvh;
+        padding: calc(env(safe-area-inset-top) + 0.5rem)
+                 calc(env(safe-area-inset-right) + 1rem)
+                 calc(env(safe-area-inset-bottom) + 7.5rem)
+                 calc(env(safe-area-inset-left) + 1rem);
       }
 
-      [x-cloak] {
-        display: none !important;
-      }
+      [x-cloak] { display: none !important; }
+    }
 
-      @keyframes fadeIn {
-        from {
-          opacity: 0;
-          transform: translateY(12px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      @keyframes fadeInScale {
-        from {
-          opacity: 0;
-          transform: scale(0.95);
-        }
-        to {
-          opacity: 1;
-          transform: scale(1);
-        }
-      }
-
-      @keyframes slideUp {
-        from {
-          opacity: 0;
-          transform: translateY(20px);
-        }
-        to {
-          opacity: 1;
-          transform: translateY(0);
-        }
-      }
-
-      .fade-in {
-        animation: fadeIn 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-      }
-
-      .fade-in-scale {
-        animation: fadeInScale 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)
-          forwards;
-      }
-
-      .slide-up {
-        animation: slideUp 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
-      }
-
-      .glass {
-        background: rgba(28, 28, 30, 0.85);
-        backdrop-filter: blur(20px) saturate(180%);
-        -webkit-backdrop-filter: blur(20px) saturate(180%);
-      }
-
-      .product-card {
-        background: var(--color-surface);
-        border: 0.5px solid rgba(255, 255, 255, 0.08);
-        border-radius: 16px;
+    @layer components {
+      .card {
+        background: linear-gradient(180deg, var(--color-surface-elevated), var(--color-surface));
+        border: 1px solid var(--color-border);
+        border-radius: 1rem;
         overflow: hidden;
+        transition: transform 150ms var(--ease-out-expo), box-shadow 150ms var(--ease-out-expo);
       }
 
-      .code-display {
-        font-family: "SF Mono", Menlo, Monaco, monospace;
-        letter-spacing: 0.5px;
+      .card:active { transform: scale(0.98); }
+
+      .empty-state {
+        background: linear-gradient(135deg, var(--color-surface), var(--color-surface-elevated));
+        border: 1px dashed var(--color-border);
+        border-radius: 1.5rem;
       }
 
-      .error-banner {
-        background: linear-gradient(
-          135deg,
-          rgba(255, 69, 58, 0.15) 0%,
-          rgba(255, 69, 58, 0.05) 100%
-        );
-        border: 1px solid rgba(255, 69, 58, 0.3);
+      .empty-icon {
+        background: linear-gradient(135deg, var(--color-surface-elevated), var(--color-surface-tertiary));
+        border-radius: 1.25rem;
       }
 
-      .barcode-container svg {
+      .barcode-box {
+        background: linear-gradient(180deg, #fff, #f8f8f8);
+        border-radius: 0 0 0.75rem 0.75rem;
+      }
+
+      .barcode-box svg {
         width: 100% !important;
         height: auto !important;
+        max-height: 5rem;
         display: block;
-        max-height: 80px;
       }
-    </style>
-  </head>
-  <body
-    x-cloak
-    x-data="ScannerApp"
-    class="flex min-h-dvh flex-col select-none bg-bg text-text antialiased"
-    aria-label="Scanner Application"
-  >
-    <main class="mx-auto flex w-full max-w-lg flex-1 flex-col">
-      <header class="fade-in px-5 pb-2 pt-6 text-center">
-        <h1 class="text-2xl font-bold tracking-tight text-text">Control</h1>
-      </header>
 
-      <section class="flex-1 px-4 pb-10 pt-5">
-        <template x-if="scannedItems.length === 0">
-          <div class="fade-in flex flex-col items-center">
-            <div
-              class="mb-6 w-full rounded-2xl border border-border bg-surface p-8 text-center"
-              role="alert"
-              aria-live="polite"
-            >
-              <div
-                class="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-surface-elevated"
-              >
-                <svg
-                  class="h-8 w-8 text-muted"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  viewBox="0 0 24 24"
-                  aria-hidden="true"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M13.5 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5Z"
-                  />
-                </svg>
-              </div>
-              <p class="text-base font-semibold text-text">
-                Начните сканирование
-              </p>
-              <p class="mt-1 text-sm text-muted">
-                Нажмите кнопку внизу, чтобы открыть сканер
-              </p>
+      .code-text {
+        font-family: "SF Mono", Menlo, monospace;
+        font-variant-numeric: tabular-nums;
+        letter-spacing: 0.05em;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 150ms var(--ease-out-expo);
+      }
+
+      .btn:active { transform: scale(0.92); }
+
+      .btn-delete {
+        background: oklch(65% 0.25 25 / 0.1);
+        border: 1px solid oklch(65% 0.25 25 / 0.2);
+        color: var(--color-error);
+      }
+
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
+        font-weight: 600;
+        border-radius: 9999px;
+        background: var(--color-surface-elevated);
+        color: var(--color-text-secondary);
+      }
+
+      .toast {
+        background: oklch(20% 0.01 285 / 0.95);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid var(--color-border);
+        border-radius: 9999px;
+        box-shadow: 0 8px 32px oklch(0% 0 0 / 0.5);
+      }
+
+      .skeleton {
+        background: linear-gradient(90deg, var(--color-surface) 25%, var(--color-surface-elevated) 50%, var(--color-surface) 75%);
+        background-size: 200% 100%;
+        animation: shimmer 1.5s infinite;
+      }
+    }
+
+    @layer utilities {
+      @keyframes fade-in {
+        from { opacity: 0; }
+        to { opacity: 1; }
+      }
+
+      @keyframes slide-up {
+        from { opacity: 0; transform: translateY(1.5rem); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+
+      @keyframes shimmer {
+        0% { background-position: -200% 0; }
+        100% { background-position: 200% 0; }
+      }
+
+      .animate-fade { animation: fade-in 250ms var(--ease-out-expo) forwards; }
+      .animate-slide { animation: slide-up 400ms var(--ease-out-expo) forwards; }
+    }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "alpinejs": "https://esm.run/alpinejs@3",
+        "jsbarcode": "https://esm.run/jsbarcode@3",
+        "@tma.js/sdk": "https://esm.run/@tma.js/sdk@3"
+      }
+    }
+  </script>
+</head>
+
+<body x-cloak x-data="app" class="flex flex-col select-none">
+  <main class="mx-auto flex w-full max-w-md flex-1 flex-col">
+    <header class="animate-fade px-2 pb-4 pt-6 text-center">
+      <h1 class="text-[1.75rem] font-bold tracking-tight">Control</h1>
+      <p class="mt-1 text-sm text-text-muted">Сканер штрих-кодов</p>
+    </header>
+
+    <section class="flex-1 px-2 pb-8">
+      <template x-if="items.length === 0 && !loading">
+        <div class="animate-slide">
+          <div class="empty-state flex flex-col items-center p-8 text-center">
+            <div class="empty-icon mb-6 flex h-20 w-20 items-center justify-center">
+              <svg class="h-10 w-10 text-text-muted" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 3.75 9.375v-4.5ZM3.75 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5ZM13.5 4.875c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5A1.125 1.125 0 0 1 13.5 9.375v-4.5Z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 14.625c0-.621.504-1.125 1.125-1.125h4.5c.621 0 1.125.504 1.125 1.125v4.5c0 .621-.504 1.125-1.125 1.125h-4.5a1.125 1.125 0 0 1-1.125-1.125v-4.5Z"/>
+              </svg>
+            </div>
+            <h2 class="text-lg font-semibold">Начните сканирование</h2>
+            <p class="mt-2 max-w-64 text-sm leading-relaxed text-text-muted">Нажмите кнопку «Сканировать» внизу экрана</p>
+            <div class="mt-6 flex items-center gap-2 text-xs text-text-tertiary">
+              <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5"/>
+              </svg>
+              <span>EAN-8 и EAN-13</span>
             </div>
           </div>
-        </template>
+        </div>
+      </template>
 
-        <template x-if="scannedItems.length > 0">
-          <div class="slide-up">
-            <div class="mb-4 flex items-center justify-center">
-              <h2 class="text-sm font-semibold text-muted">
-                Отсканировано:
-                <span class="text-text" x-text="scannedItems.length"></span>
-              </h2>
+      <template x-if="loading">
+        <div class="space-y-3">
+          <template x-for="i in 3">
+            <div class="card">
+              <div class="p-4"><div class="skeleton h-5 w-32 rounded-md"></div></div>
+              <div class="skeleton h-20"></div>
             </div>
+          </template>
+        </div>
+      </template>
 
-            <div class="space-y-3">
-              <template x-for="item in scannedItems" :key="item.id">
-                <div
-                  class="product-card slide-up"
-                  x-init="$nextTick(() => renderBarcode(item))"
-                  role="region"
-                  aria-label="Scanned Item"
-                >
-                  <div class="flex items-center justify-between p-4 pb-3">
-                    <p
-                      class="code-display cursor-pointer truncate text-base font-bold text-text"
-                      x-text="item.code"
-                      @click="copyCode(item.code)"
-                      aria-label="Copy code"
-                    ></p>
-                    <button
-                      @click="removeItem(item.id)"
-                      class="ml-3 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-surface-elevated transition-all active:scale-90"
-                      aria-label="Remove item"
-                    >
-                      <svg
-                        class="h-[18px] w-[18px] text-error/70"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="1.5"
-                        viewBox="0 0 24 24"
-                        aria-hidden="true"
-                      >
-                        <path
-                          stroke-linecap="round"
-                          stroke-linejoin="round"
-                          d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"
-                        />
-                      </svg>
-                    </button>
-                  </div>
+      <template x-if="items.length > 0 && !loading">
+        <div class="animate-fade">
+          <div class="mb-4 flex justify-center">
+            <div class="badge">
+              <svg class="mr-1.5 h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+              </svg>
+              <span>Отсканировано: <strong class="text-text-primary" x-text="items.length"></strong></span>
+            </div>
+          </div>
 
-                  <div class="bg-white mt-px">
-                    <div
-                      class="barcode-container flex items-center justify-center p-3"
-                    >
-                      <svg :id="'bar_' + item.id" aria-hidden="true"></svg>
-                    </div>
-                  </div>
+          <ul class="space-y-3">
+            <template x-for="item in items" :key="item.id">
+              <li class="card animate-slide" x-init="$nextTick(() => renderBarcode(item))">
+                <div class="flex items-center justify-between gap-3 p-4 pb-3">
+                  <button type="button" class="btn code-text flex-1 rounded-lg py-1 text-left text-base font-bold" @click="copy(item.code)" x-text="item.code"></button>
+                  <button type="button" class="btn btn-delete h-9 w-9 flex-shrink-0 rounded-xl" @click="remove(item.id)">
+                    <svg class="h-4.5 w-4.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0"/>
+                    </svg>
+                  </button>
                 </div>
-              </template>
-            </div>
-          </div>
-        </template>
-      </section>
-    </main>
+                <div class="barcode-box p-3">
+                  <svg :id="`bc-${item.id}`"></svg>
+                </div>
+              </li>
+            </template>
+          </ul>
+        </div>
+      </template>
+    </section>
+  </main>
 
-    <div
-      x-show="toast.visible"
-      x-transition:enter="transition ease-out duration-200"
-      x-transition:enter-start="opacity-0 translate-y-4"
-      x-transition:enter-end="opacity-100 translate-y-0"
-      x-transition:leave="transition ease-in duration-150"
-      x-transition:leave-start="opacity-100 translate-y-0"
-      x-transition:leave-end="opacity-0 translate-y-4"
-      class="glass fixed bottom-32 left-1/2 z-50 -translate-x-1/2 rounded-full px-5 py-3 shadow-lg"
-      role="status"
-      aria-live="polite"
-    >
-      <div class="flex items-center gap-2.5 whitespace-nowrap">
-        <template x-if="toast.type === 'success'">
-          <svg
-            class="h-5 w-5 text-success"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="m4.5 12.75 6 6 9-13.5"
-            />
-          </svg>
-        </template>
-        <template x-if="toast.type === 'warning'">
-          <svg
-            class="h-5 w-5 text-warning"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"
-            />
-          </svg>
-        </template>
-        <template x-if="toast.type === 'error'">
-          <svg
-            class="h-5 w-5 text-error"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-            aria-hidden="true"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"
-            />
-          </svg>
-        </template>
-        <span
-          class="text-sm font-medium text-white"
-          x-text="toast.message"
-        ></span>
-      </div>
+  <div
+    x-show="toast.show"
+    x-transition:enter="transition ease-out duration-200"
+    x-transition:enter-start="opacity-0 translate-y-4 scale-95"
+    x-transition:enter-end="opacity-100 translate-y-0 scale-100"
+    x-transition:leave="transition ease-in duration-150"
+    x-transition:leave-start="opacity-100 translate-y-0 scale-100"
+    x-transition:leave-end="opacity-0 translate-y-4 scale-95"
+    class="toast fixed bottom-32 left-1/2 z-50 -translate-x-1/2 px-5 py-3"
+  >
+    <div class="flex items-center gap-2.5 whitespace-nowrap">
+      <template x-if="toast.type === 'success'">
+        <svg class="h-5 w-5 text-success" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="m4.5 12.75 6 6 9-13.5"/>
+        </svg>
+      </template>
+      <template x-if="toast.type === 'warning'">
+        <svg class="h-5 w-5 text-warning" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126ZM12 15.75h.007v.008H12v-.008Z"/>
+        </svg>
+      </template>
+      <template x-if="toast.type === 'error'">
+        <svg class="h-5 w-5 text-error" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 3.75h.008v.008H12v-.008Z"/>
+        </svg>
+      </template>
+      <span class="text-sm font-medium" x-text="toast.msg"></span>
     </div>
+  </div>
 
-    <script>
-      const TelegramApp = {
-        get tg() {
-          return globalThis.Telegram?.WebApp ?? null;
-        },
+  <script type="module">
+    import Alpine from 'alpinejs';
+    import JsBarcode from 'jsbarcode';
+    import * as TMA from '@tma.js/sdk';
 
-        get available() {
-          return !!this.tg;
-        },
+    const STORAGE_KEY = 'scanner_v1';
+    const EAN13 = /^\d{13}$/;
+    const EAN8 = /^\d{8}$/;
 
-        init() {
-          const tg = this.tg;
-          if (!tg) return;
-          try {
-            tg.ready();
-            tg.requestFullscreen?.();
-            tg.disableVerticalSwipes?.();
-            tg.setHeaderColor?.("#000000");
-            tg.setBackgroundColor?.("#000000");
-            tg.setBottomBarColor?.("#0A0A0A");
-          } catch (e) {
-            console.warn("[TG] init error:", e);
+    let tg = null;
+    let mainBtn = null;
+    let secondaryBtn = null;
+    let haptic = null;
+    let cloud = null;
+    let popup = null;
+    let qrScanner = null;
+
+    const initTMA = async () => {
+      try {
+        const [isTMA] = TMA.isTMA('simple');
+        if (!isTMA) return false;
+
+        await TMA.init();
+
+        if (TMA.backButton.mount.isAvailable()) TMA.backButton.mount();
+        if (TMA.miniApp.mount.isAvailable()) TMA.miniApp.mount();
+        if (TMA.themeParams.mount.isAvailable()) TMA.themeParams.mount();
+        if (TMA.viewport.mount.isAvailable()) {
+          TMA.viewport.mount();
+          TMA.viewport.expand();
+          if (TMA.viewport.requestFullscreen.isAvailable()) {
+            TMA.viewport.requestFullscreen();
           }
-        },
+        }
 
-        haptic(style = "light") {
-          try {
-            this.tg?.HapticFeedback?.impactOccurred(style);
-          } catch {}
-        },
-
-        notify(type = "success") {
-          try {
-            this.tg?.HapticFeedback?.notificationOccurred(type);
-          } catch {}
-        },
-
-        confirm(msg, cb) {
-          try {
-            if (typeof this.tg?.showConfirm === "function") {
-              this.tg.showConfirm(msg, cb);
-              return;
-            }
-          } catch {}
-          cb(confirm(msg));
-        },
-
-        closeScanQr() {
-          try {
-            this.tg?.closeScanQrPopup?.();
-          } catch {}
-        },
-
-        scanQr(text, onResult, onClose) {
-          const tg = this.tg;
-          if (!tg || typeof tg.showScanQrPopup !== "function") {
-            onClose?.();
-            return;
+        if (TMA.swipeBehavior.mount.isAvailable()) {
+          TMA.swipeBehavior.mount();
+          if (TMA.swipeBehavior.disableVertical.isAvailable()) {
+            TMA.swipeBehavior.disableVertical();
           }
+        }
 
-          let closed = false;
-
-          const handleClose = () => {
-            if (closed) return;
-            closed = true;
-            tg.offEvent("scanQrPopupClosed", handleClose);
-            onClose?.();
-          };
-
-          tg.onEvent("scanQrPopupClosed", handleClose);
-
-          tg.showScanQrPopup({ text: text ?? "" }, (result) => {
-            if (!result) return false;
-            const shouldClose = onResult(result);
-            if (shouldClose) {
-              closed = true;
-              tg.offEvent("scanQrPopupClosed", handleClose);
-              this.closeScanQr();
-            }
-            return shouldClose;
-          });
-        },
-
-        async cloudGet(key) {
-          const tg = this.tg;
-          if (!tg?.CloudStorage) throw new Error("CloudStorage unavailable");
-          return new Promise((resolve, reject) => {
-            tg.CloudStorage.getItem(key, (err, value) => {
-              if (err) reject(new Error(err));
-              else resolve(value);
-            });
-          });
-        },
-
-        async cloudSet(key, value) {
-          const tg = this.tg;
-          if (!tg?.CloudStorage) throw new Error("CloudStorage unavailable");
-          return new Promise((resolve, reject) => {
-            tg.CloudStorage.setItem(key, value, (err, success) => {
-              if (err) reject(new Error(err));
-              else resolve(success);
-            });
-          });
-        },
-      };
-
-      const AudioManager = {
-        ctx: null,
-
-        init() {
-          if (this.ctx) return;
-          try {
-            const AC = globalThis.AudioContext ?? globalThis.webkitAudioContext;
-            if (AC) this.ctx = new AC();
-          } catch {}
-        },
-
-        resume() {
-          if (this.ctx?.state === "suspended") {
-            this.ctx.resume().catch(() => {});
+        if (TMA.closingBehavior.mount.isAvailable()) {
+          TMA.closingBehavior.mount();
+          if (TMA.closingBehavior.enableConfirmation.isAvailable()) {
+            TMA.closingBehavior.enableConfirmation();
           }
-        },
+        }
 
-        playSuccess() {
-          if (!this.ctx) return;
-          try {
-            this.resume();
-            const t = this.ctx.currentTime;
-            const osc = this.ctx.createOscillator();
-            const gain = this.ctx.createGain();
-            osc.type = "sine";
-            osc.frequency.setValueAtTime(880, t);
-            osc.frequency.setValueAtTime(1320, t + 0.08);
-            gain.gain.setValueAtTime(0.12, t);
-            gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
-            osc.connect(gain);
-            gain.connect(this.ctx.destination);
-            osc.start(t);
-            osc.stop(t + 0.15);
-          } catch {}
-        },
-      };
+        if (TMA.miniApp.setHeaderColor.isAvailable()) TMA.miniApp.setHeaderColor('#000000');
+        if (TMA.miniApp.setBgColor.isAvailable()) TMA.miniApp.setBgColor('#000000');
+        if (TMA.miniApp.setBottomBarColor.isAvailable()) TMA.miniApp.setBottomBarColor('#0a0a0a');
 
-      document.addEventListener("alpine:init", () => {
-        Alpine.data("ScannerApp", () => ({
-          isScanning: false,
-          scannedItems: [],
-          scannedCodes: {},
-          idCounter: 0,
-          toast: { visible: false, message: "", type: "success" },
-          _toastTimer: null,
-          _mainHandler: null,
-          _secondaryHandler: null,
+        if (TMA.mainButton.mount.isAvailable()) {
+          TMA.mainButton.mount();
+          mainBtn = TMA.mainButton;
+        }
 
-          async init() {
-            TelegramApp.init();
-            AudioManager.init();
-            await this.loadHistory().catch(() => this.showToast("Ошибка загрузки истории", "error"));
-            this.setupButtons();
-          },
+        if (TMA.secondaryButton.mount.isAvailable()) {
+          TMA.secondaryButton.mount();
+          secondaryBtn = TMA.secondaryButton;
+        }
 
-          setupButtons() {
-            const tg = TelegramApp.tg;
-            if (!tg) return;
+        haptic = TMA.hapticFeedback;
+        cloud = TMA.cloudStorage;
+        popup = TMA.popup;
+        qrScanner = TMA.qrScanner;
 
-            const mb = tg.MainButton;
-            const sb = tg.SecondaryButton;
+        TMA.miniApp.ready();
+        return true;
+      } catch (e) {
+        console.warn('TMA init failed:', e);
+        return false;
+      }
+    };
 
-            if (this._mainHandler) {
-              mb.offClick(this._mainHandler);
-            }
-            if (this._secondaryHandler) {
-              sb.offClick(this._secondaryHandler);
-            }
+    const doHaptic = (type = 'light') => {
+      if (haptic?.impactOccurred?.isAvailable?.()) {
+        haptic.impactOccurred(type);
+      }
+    };
 
-            this._mainHandler = () => this.scan();
-            this._secondaryHandler = () => this.confirmClearAll();
+    const doNotify = (type = 'success') => {
+      if (haptic?.notificationOccurred?.isAvailable?.()) {
+        haptic.notificationOccurred(type);
+      }
+    };
 
-            mb.setText("Сканировать");
-            mb.color = "#30d158";
-            mb.textColor = "#ffffff";
-            mb.onClick(this._mainHandler);
-            mb.show();
+    const cloudGet = async (key) => {
+      if (!cloud?.get?.isAvailable?.()) return null;
+      const result = await cloud.get(key);
+      return result?.[key] ?? null;
+    };
 
-            if (this.scannedItems.length > 0) {
-              sb.setText("Очистить");
-              sb.color = "#0A0A0A";
-              sb.textColor = "#ff453a";
-              sb.position = "bottom";
-              sb.onClick(this._secondaryHandler);
-              sb.show();
-            } else {
-              sb.hide();
-            }
-          },
+    const cloudSet = async (key, value) => {
+      if (!cloud?.set?.isAvailable?.()) return;
+      await cloud.set(key, value);
+    };
 
-          scan() {
-            if (this.isScanning) return;
+    const showConfirm = async (message) => {
+      if (popup?.open?.isAvailable?.()) {
+        const result = await popup.open({ message, buttons: [{ id: 'ok', type: 'destructive', text: 'Да' }, { id: 'cancel', type: 'cancel' }] });
+        return result === 'ok';
+      }
+      return confirm(message);
+    };
 
-            this.isScanning = true;
-            TelegramApp.haptic("light");
+    const openScanner = (onResult, onClose) => {
+      if (!qrScanner?.open?.isAvailable?.()) {
+        onClose?.();
+        return;
+      }
 
-            TelegramApp.scanQr(
-              "Наведите камеру на QR-код",
-              (result) => {
-                const code = this.extractCode(result);
-                
-                if (!code) {
-                  TelegramApp.closeScanQr();
-                  this.isScanning = false;
-                  this.$nextTick(() => {
-                    this.showToast("Неверный формат кода", "error");
-                  });
-                  TelegramApp.haptic("light");
-                  return true;
-                }
-
-                if (this.scannedCodes[code]) {
-                  TelegramApp.closeScanQr();
-                  this.isScanning = false;
-                  this.$nextTick(() => {
-                    this.showToast("Этот код уже отсканирован", "warning");
-                  });
-                  TelegramApp.haptic("light");
-                  return true;
-                }
-
-                this.scannedCodes[code] = true;
-                this.idCounter++;
-
-                const item = {
-                  id: this.idCounter,
-                  code,
-                  timestamp: Date.now(),
-                };
-
-                this.scannedItems.unshift(item);
-                this.saveHistory().catch(() => this.showToast("Ошибка сохранения", "error"));
-
-                TelegramApp.notify("success");
-                AudioManager.playSuccess();
-
-                this.$nextTick(() => {
-                  this.renderBarcode(item);
-                });
-
-                this.isScanning = false;
-                this.setupButtons();
-
-                return true;
-              },
-              () => {
-                this.isScanning = false;
-              },
-            );
-          },
-
-          renderBarcode(item) {
-            const el = document.getElementById(`bar_${item.id}`);
-            if (!el) return;
-
-            try {
-              let format = "ean13";
-              if (item.code.length === 8) {
-                format = "ean8";
-              }
-
-              JsBarcode(el, item.code, {
-                format: format,
-                lineColor: "#000000",
-                background: "#ffffff",
-                width: 1.5,
-                height: 60,
-                displayValue: false,
-                margin: 4,
-                flat: true,
-              });
-            } catch (e) {
-              console.warn("[Barcode] Render error:", e);
-              if (el.parentNode) {
-                el.parentNode.innerHTML =
-                  '<p class="text-xs text-neutral-400 py-4 text-center">Ошибка штрихкода</p>';
-              }
-              this.showToast("Ошибка генерации штрихкода", "error");
-            }
-          },
-
-          extractCode(text) {
-            if (!text || typeof text !== "string") return null;
-            const trimmed = text.trim();
-            if (!trimmed.length || trimmed.length > 2048) return null;
-
-            let code = trimmed;
-            if (trimmed.startsWith("CEN;")) {
-              const parts = trimmed.split(";");
-              if (parts.length >= 2) {
-                code = parts[1];
-              }
-            }
-
-            if (/^\d{13}$/.test(code)) {
-              return code;
-            } else if (/^\d{8}$/.test(code)) {
-              return code;
-            }
-
-            return null;
-          },
-
-          async copyCode(code) {
-            TelegramApp.haptic("light");
-
-            try {
-              await navigator.clipboard.writeText(code);
-              this.showToast("Код скопирован", "success");
-              TelegramApp.notify("success");
-            } catch {
-              this.showToast("Ошибка копирования кода", "error");
-            }
-          },
-
-          removeItem(id) {
-            TelegramApp.haptic("medium");
-            const item = this.scannedItems.find((i) => i.id === id);
-            if (item) delete this.scannedCodes[item.code];
-            this.scannedItems = this.scannedItems.filter((i) => i.id !== id);
-            this.saveHistory().catch(() => this.showToast("Ошибка сохранения", "error"));
-            this.setupButtons();
-          },
-
-          confirmClearAll() {
-            TelegramApp.haptic("medium");
-            TelegramApp.confirm("Очистить всю историю сканирования?", (ok) => {
-              if (ok) {
-                this.scannedItems = [];
-                this.scannedCodes = {};
-                this.idCounter = 0;
-                this.saveHistory().catch(() => this.showToast("Ошибка сохранения", "error"));
-                TelegramApp.notify("success");
-                this.setupButtons();
-              }
-            });
-          },
-
-          showToast(msg, type = "success") {
-            if (this._toastTimer) clearTimeout(this._toastTimer);
-            this.toast = { visible: true, message: msg, type };
-            this._toastTimer = setTimeout(() => {
-              this.toast.visible = false;
-            }, 2000);
-          },
-
-          async saveHistory() {
-            const data = JSON.stringify({
-              items: this.scannedItems,
-              counter: this.idCounter,
-            });
-            await TelegramApp.cloudSet("ean_history", data);
-          },
-
-          async loadHistory() {
-            const raw = await TelegramApp.cloudGet("ean_history");
-            if (!raw) return;
-            const data = JSON.parse(raw);
-            if (data?.items && Array.isArray(data.items)) {
-              this.scannedItems = data.items;
-              this.idCounter = data.counter ?? data.items.length;
-              this.scannedCodes = Object.fromEntries(
-                data.items.map((i) => [i.code, true]),
-              );
-
-              if (this.scannedItems.length > 0) {
-                this.$nextTick(() => {
-                  requestAnimationFrame(() => {
-                    this.scannedItems.forEach((item) =>
-                      this.renderBarcode(item),
-                    );
-                  });
-                });
-              }
-            }
-          },
-        }));
+      const off = qrScanner.open('Наведите камеру на штрих-код').then(result => {
+        onResult?.(result);
+      }).catch(() => {}).finally(() => {
+        onClose?.();
       });
-    </script>
+    };
 
-    <script
-      defer
-      src="https://cdn.jsdelivr.net/npm/alpinejs@3.14.9/dist/cdn.min.js"
-    ></script>
-  </body>
+    const closeScanner = () => {
+      if (qrScanner?.close?.isAvailable?.()) {
+        qrScanner.close();
+      }
+    };
+
+    const extractCode = (text) => {
+      if (!text || typeof text !== 'string') return null;
+      const t = text.trim();
+      if (!t || t.length > 2048) return null;
+      let code = t;
+      if (t.startsWith('CEN;')) {
+        const parts = t.split(';');
+        if (parts.length >= 2) code = parts[1];
+      }
+      if (EAN13.test(code) || EAN8.test(code)) return code;
+      return null;
+    };
+
+    const audioCtx = (() => {
+      let ctx = null;
+      return {
+        get() {
+          if (!ctx) {
+            const AC = globalThis.AudioContext ?? globalThis.webkitAudioContext;
+            if (AC) ctx = new AC();
+          }
+          return ctx;
+        },
+        async playSuccess() {
+          const c = this.get();
+          if (!c) return;
+          if (c.state === 'suspended') await c.resume();
+          const t = c.currentTime;
+          const osc = c.createOscillator();
+          const gain = c.createGain();
+          osc.type = 'sine';
+          osc.frequency.setValueAtTime(880, t);
+          osc.frequency.setValueAtTime(1320, t + 0.08);
+          gain.gain.setValueAtTime(0.1, t);
+          gain.gain.exponentialRampToValueAtTime(0.001, t + 0.15);
+          osc.connect(gain);
+          gain.connect(c.destination);
+          osc.start(t);
+          osc.stop(t + 0.15);
+        }
+      };
+    })();
+
+    Alpine.data('app', () => ({
+      loading: true,
+      scanning: false,
+      items: [],
+      codes: new Map(),
+      counter: 0,
+      toast: { show: false, msg: '', type: 'success' },
+      _toastTimer: null,
+
+      async init() {
+        await initTMA();
+        await this.load();
+        this.loading = false;
+        this.setupButtons();
+        this.$watch('items.length', () => this.updateSecondary());
+      },
+
+      setupButtons() {
+        if (mainBtn) {
+          mainBtn.setParams({ text: 'Сканировать', bgColor: '#30d158', textColor: '#ffffff', isVisible: true, isEnabled: true });
+          mainBtn.onClick(() => this.scan());
+        }
+        if (secondaryBtn) {
+          secondaryBtn.setParams({ text: 'Очистить всё', bgColor: '#0a0a0a', textColor: '#ff453a', position: 'bottom', isVisible: false, isEnabled: true });
+          secondaryBtn.onClick(() => this.confirmClear());
+        }
+        this.updateSecondary();
+      },
+
+      updateSecondary() {
+        if (!secondaryBtn) return;
+        if (this.items.length > 0) {
+          secondaryBtn.setParams({ isVisible: true });
+        } else {
+          secondaryBtn.setParams({ isVisible: false });
+        }
+      },
+
+      scan() {
+        if (this.scanning) return;
+        this.scanning = true;
+        doHaptic('light');
+
+        openScanner(
+          (result) => {
+            this.handleResult(result);
+          },
+          () => {
+            this.scanning = false;
+          }
+        );
+      },
+
+      handleResult(result) {
+        const code = extractCode(result);
+
+        if (!code) {
+          closeScanner();
+          this.scanning = false;
+          this.notify('Неверный формат кода', 'error');
+          doNotify('error');
+          return;
+        }
+
+        if (this.codes.has(code)) {
+          closeScanner();
+          this.scanning = false;
+          this.notify('Этот код уже отсканирован', 'warning');
+          doNotify('warning');
+          return;
+        }
+
+        this.add(code);
+        doNotify('success');
+        audioCtx.playSuccess();
+        closeScanner();
+        this.scanning = false;
+      },
+
+      add(code) {
+        this.counter++;
+        const item = { id: this.counter, code, ts: Date.now() };
+        this.codes.set(code, true);
+        this.items.unshift(item);
+        this.$nextTick(() => this.renderBarcode(item));
+        this.save();
+      },
+
+      renderBarcode(item) {
+        const el = document.getElementById(`bc-${item.id}`);
+        if (!el) return;
+        try {
+          JsBarcode(el, item.code, {
+            format: item.code.length === 8 ? 'ean8' : 'ean13',
+            lineColor: '#000',
+            background: 'transparent',
+            width: 1.5,
+            height: 60,
+            displayValue: false,
+            margin: 8,
+            flat: true
+          });
+        } catch {
+          el.parentNode.innerHTML = '<p class="py-4 text-center text-xs text-text-muted">Ошибка штрих-кода</p>';
+        }
+      },
+
+      async copy(code) {
+        doHaptic('light');
+        try {
+          await navigator.clipboard.writeText(code);
+          this.notify('Код скопирован', 'success');
+          doNotify('success');
+        } catch {
+          this.notify('Ошибка копирования', 'error');
+        }
+      },
+
+      remove(id) {
+        doHaptic('medium');
+        const item = this.items.find(i => i.id === id);
+        if (item) this.codes.delete(item.code);
+        this.items = this.items.filter(i => i.id !== id);
+        this.save();
+      },
+
+      async confirmClear() {
+        doHaptic('medium');
+        const ok = await showConfirm('Очистить всю историю?');
+        if (ok) {
+          this.items = [];
+          this.codes.clear();
+          this.counter = 0;
+          this.save();
+          doNotify('success');
+        }
+      },
+
+      notify(msg, type = 'success') {
+        if (this._toastTimer) clearTimeout(this._toastTimer);
+        this.toast = { show: true, msg, type };
+        this._toastTimer = setTimeout(() => { this.toast.show = false; }, 2000);
+      },
+
+      async save() {
+        const data = JSON.stringify({ items: this.items, counter: this.counter });
+        await cloudSet(STORAGE_KEY, data);
+      },
+
+      async load() {
+        const raw = await cloudGet(STORAGE_KEY);
+        if (!raw) return;
+        try {
+          const data = JSON.parse(raw);
+          if (Array.isArray(data.items)) {
+            this.items = data.items;
+            this.counter = data.counter ?? data.items.length;
+            this.codes = new Map(data.items.map(i => [i.code, true]));
+            this.$nextTick(() => {
+              requestAnimationFrame(() => {
+                this.items.forEach(item => this.renderBarcode(item));
+              });
+            });
+          }
+        } catch {
+          this.notify('Ошибка загрузки данных', 'error');
+        }
+      }
+    }));
+
+    Alpine.start();
+  </script>
+</body>
 </html>

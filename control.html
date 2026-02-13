@@ -743,7 +743,7 @@
                         <div class="card-actions mt-0.5">
                           <button
                             type="button"
-                            class="btn btn-icon is-download"
+                            class="btn btn-icon btn-download"
                             @click="downloadBarcode(item)"
                             aria-label="Скачать штрих-код"
                           >
@@ -763,7 +763,7 @@
                           </button>
                           <button
                             type="button"
-                            class="btn btn-icon is-share"
+                            class="btn btn-icon btn-share"
                             @click="shareCode(item)"
                             aria-label="Поделиться"
                           >
@@ -783,7 +783,7 @@
                           </button>
                           <button
                             type="button"
-                            class="btn btn-icon is-delete"
+                            class="btn btn-icon btn-delete"
                             @click="remove(item.id)"
                             :aria-label="`Удалить ${item.code}`"
                           >

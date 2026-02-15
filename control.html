@@ -895,14 +895,6 @@
                   this.items = data.items;
                   this.counter = data.counter ?? data.items.length;
                   this.codes = new Set(data.items.map((i) => i.code));
-
-                  this.$nextTick(() => {
-                      requestAnimationFrame(() => {
-                          for (const item of this.items) {
-                              this.renderBarcode(item);
-                          }
-                      });
-                  });
               } catch (err) {
                   console.error("[Control] Ошибка загрузки данных:", err);
                   this.showToast("Не удалось загрузить сохранённые данные", "error");

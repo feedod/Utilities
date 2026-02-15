@@ -1124,26 +1124,7 @@
       }
 
       const SponsorService = {
-        sponsors: [
-          {
-            username: "telegram",
-            title: "Telegram",
-            photo:
-              "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=200&auto=format&fit=crop",
-          },
-          {
-            username: "durov",
-            title: "Pavel Durov",
-            photo:
-              "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
-          },
-          {
-            username: "tiktok",
-            title: "TikTok",
-            photo:
-              "https://images.unsplash.com/photo-1487412912498-0447578fcca8?q=80&w=200&auto=format&fit=crop",
-          },
-        ],
+        sponsors: [],
         getState() {
           const raw = localStorage.getItem(AppConfig.SPONSORS_KEY);
           try {

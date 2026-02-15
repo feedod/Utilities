@@ -520,7 +520,7 @@
       aria-live="polite"
       aria-atomic="true"
     >
-      <div class="flex items-center gap-2.5 whitespace-nowrap">
+      <div class="flex max-w-[90vw] items-start gap-2.5">
         <template x-if="toast.type === 'success'">
           <svg
             class="h-5 w-5 text-success"
@@ -570,7 +570,7 @@
           </svg>
         </template>
         <span
-          class="text-sm font-medium text-text-primary"
+          class="text-sm font-medium text-text-primary break-words whitespace-normal leading-snug text-center"
           x-text="toast.message"
         ></span>
       </div>

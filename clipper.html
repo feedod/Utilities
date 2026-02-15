@@ -4,37 +4,49 @@
     <meta charset="UTF-8" />
     <meta
       name="viewport"
-      content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,viewport-fit=cover"
+      content="width=device-width,initial-scale=1,viewport-fit=cover"
     />
     <meta name="color-scheme" content="dark" />
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4.1.18"></script>
-    <style type="text/tailwindcss">
-      @theme {
-        --color-bg: #0b0b0f;
-        --color-surface: #1c1c1e;
-        --color-border: #2c2c2e;
-        --color-text: #ffffff;
-        --color-muted: #8e8e93;
+    <style>
+      :root {
+        color-scheme: dark;
+        --bg: #0b0b0f;
+        --surface: #16161c;
+        --surface-2: #1f1f26;
+        --border: #2a2a34;
+        --text: #f2f2f7;
+        --muted: #8e8e93;
+        --accent: #7c5cff;
+        --positive: #2ecc71;
+        --warning: #f7b731;
+        --danger: #ff5d6c;
+        --glow: rgba(124, 92, 255, 0.22);
+        --shadow: 0 12px 32px rgba(0, 0, 0, 0.35);
+        --radius-lg: 22px;
+        --radius-md: 16px;
+        --radius-sm: 12px;
       }
 
       * {
+        box-sizing: border-box;
         -webkit-tap-highlight-color: transparent;
         -webkit-touch-callout: none;
       }
 
       html,
       body {
-        background: var(--color-bg);
-        font-family:
-          -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui,
-          sans-serif;
+        height: 100%;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          system-ui, sans-serif;
+        background: var(--bg);
+        color: var(--text);
         overscroll-behavior: none;
         -webkit-font-smoothing: antialiased;
         scrollbar-width: none;
       }
 
-      html::-webkit-scrollbar,
       body::-webkit-scrollbar {
         display: none;
       }
@@ -44,13 +56,457 @@
           env(safe-area-inset-bottom) env(safe-area-inset-left);
       }
 
-      input {
-        font-size: 16px;
-        caret-color: #ffffff;
+      img {
+        display: block;
+        max-width: 100%;
       }
 
-      input:focus {
-        outline: none;
+      button,
+      input,
+      select {
+        font: inherit;
+        color: inherit;
+        border: none;
+        background: none;
+      }
+
+      input:focus,
+      select:focus,
+      button:focus-visible {
+        outline: 2px solid rgba(124, 92, 255, 0.6);
+        outline-offset: 2px;
+      }
+
+      .app {
+        min-height: 100dvh;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .container {
+        width: min(100%, 480px);
+        margin: 0 auto;
+        padding: 24px 18px 120px;
+        display: flex;
+        flex-direction: column;
+        gap: 22px;
+      }
+
+      .hero {
+        text-align: center;
+        padding-top: 10px;
+      }
+
+      .hero h1 {
+        margin: 0;
+        font-size: 30px;
+        font-weight: 700;
+        letter-spacing: -0.02em;
+      }
+
+      .hero p {
+        margin: 8px 0 0;
+        color: var(--muted);
+        font-size: 13px;
+      }
+
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        box-shadow: var(--shadow);
+      }
+
+      .card-inner {
+        padding: 16px;
+      }
+
+      .input-wrap {
+        position: relative;
+      }
+
+      .input {
+        width: 100%;
+        height: 56px;
+        padding: 0 54px 0 44px;
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        color: var(--text);
+      }
+
+      .input::placeholder {
+        color: var(--muted);
+      }
+
+      .input-icon {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        color: var(--muted);
+      }
+
+      .clear-btn {
+        position: absolute;
+        right: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        display: grid;
+        place-items: center;
+        background: var(--surface-2);
+      }
+
+      .primary-btn {
+        width: 100%;
+        height: 56px;
+        border-radius: var(--radius-lg);
+        background: var(--accent);
+        color: white;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        transition: transform 0.08s ease, opacity 0.2s ease;
+      }
+
+      .primary-btn:active {
+        transform: scale(0.98);
+      }
+
+      .secondary-btn {
+        width: 100%;
+        height: 52px;
+        border-radius: var(--radius-lg);
+        background: var(--surface);
+        border: 1px solid var(--border);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+      }
+
+      .pill-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .pill {
+        padding: 8px 14px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 600;
+        color: var(--muted);
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .pill.active {
+        color: white;
+        background: linear-gradient(135deg, #7c5cff, #5b7cfa);
+        border-color: transparent;
+        box-shadow: 0 8px 24px rgba(124, 92, 255, 0.32);
+      }
+
+      .top-widget {
+        display: grid;
+        gap: 12px;
+      }
+
+      .top-widget-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .top-widget-title {
+        font-weight: 700;
+        font-size: 16px;
+      }
+
+      .country-select {
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 8px 12px;
+        font-weight: 600;
+        font-size: 12px;
+        color: var(--text);
+      }
+
+      .video-strip {
+        display: grid;
+        gap: 10px;
+      }
+
+      .video-card {
+        display: grid;
+        grid-template-columns: 90px 1fr;
+        gap: 12px;
+        padding: 12px;
+        border-radius: var(--radius-md);
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+      }
+
+      .video-cover {
+        width: 90px;
+        height: 64px;
+        border-radius: 12px;
+        overflow: hidden;
+        position: relative;
+      }
+
+      .video-cover img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .video-cover span {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        background: rgba(0, 0, 0, 0.65);
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 10px;
+        font-weight: 600;
+      }
+
+      .video-info h4 {
+        margin: 0 0 6px;
+        font-size: 13px;
+      }
+
+      .video-meta {
+        font-size: 11px;
+        color: var(--muted);
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+      }
+
+      .section-title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .section-title h2 {
+        margin: 0;
+        font-size: 16px;
+      }
+
+      .badge {
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: rgba(124, 92, 255, 0.16);
+        color: #c3b6ff;
+        font-size: 11px;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      .progress {
+        display: grid;
+        gap: 8px;
+      }
+
+      .progress-bar {
+        width: 100%;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--surface-2);
+        overflow: hidden;
+        border: 1px solid var(--border);
+      }
+
+      .progress-fill {
+        height: 100%;
+        border-radius: inherit;
+        transition: width 0.2s ease;
+      }
+
+      .error {
+        border: 1px solid rgba(255, 93, 108, 0.35);
+        background: rgba(255, 93, 108, 0.08);
+        color: #ffd2d7;
+        padding: 14px;
+        border-radius: var(--radius-md);
+        font-size: 13px;
+      }
+
+      .video-wrap {
+        background: #000;
+        border-radius: var(--radius-lg);
+        overflow: hidden;
+        position: relative;
+        min-height: 48dvh;
+        border: 1px solid var(--border);
+      }
+
+      video {
+        width: 100%;
+        height: 100%;
+        display: block;
+        object-fit: contain;
+      }
+
+      .overlay-chip {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(0, 0, 0, 0.7);
+        border-radius: 10px;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+
+      .overlay-chip.right {
+        left: auto;
+        right: 12px;
+      }
+
+      .stats-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .stats-row {
+        display: grid;
+        gap: 10px;
+      }
+
+      .stat {
+        text-align: center;
+        padding: 10px;
+        border-radius: 14px;
+        background: var(--surface-2);
+        border: 1px solid var(--border);
+      }
+
+      .stat h4 {
+        margin: 6px 0 0;
+        font-size: 14px;
+      }
+
+      .stat p {
+        margin: 2px 0 0;
+        font-size: 10px;
+        color: var(--muted);
+      }
+
+      .history-strip {
+        display: flex;
+        gap: 10px;
+        overflow-x: auto;
+        padding-bottom: 6px;
+        scrollbar-width: none;
+      }
+
+      .history-strip::-webkit-scrollbar {
+        display: none;
+      }
+
+      .history-card {
+        width: 90px;
+        flex: 0 0 auto;
+      }
+
+      .history-thumb {
+        width: 90px;
+        height: 120px;
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid var(--border);
+        position: relative;
+      }
+
+      .history-thumb img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+
+      .history-thumb span {
+        position: absolute;
+        bottom: 6px;
+        right: 6px;
+        background: rgba(0, 0, 0, 0.7);
+        padding: 2px 6px;
+        border-radius: 8px;
+        font-size: 9px;
+      }
+
+      .sponsor-grid {
+        display: grid;
+        gap: 10px;
+      }
+
+      .sponsor-card {
+        display: grid;
+        grid-template-columns: 56px 1fr;
+        gap: 12px;
+        padding: 12px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: var(--surface-2);
+        align-items: center;
+      }
+
+      .sponsor-card img {
+        width: 56px;
+        height: 56px;
+        border-radius: 50%;
+        border: 2px solid var(--border);
+        object-fit: cover;
+      }
+
+      .sponsor-actions {
+        display: flex;
+        gap: 8px;
+        margin-top: 8px;
+      }
+
+      .ghost-btn {
+        padding: 8px 10px;
+        border-radius: 10px;
+        background: transparent;
+        border: 1px solid var(--border);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      .success {
+        color: var(--positive);
+        font-weight: 700;
+      }
+
+      .footer {
+        text-align: center;
+        color: var(--muted);
+        font-size: 12px;
+        padding-top: 8px;
+      }
+
+      .fade {
+        animation: fadeIn 0.4s ease both;
       }
 
       @keyframes fadeIn {
@@ -63,750 +519,395 @@
           transform: translateY(0);
         }
       }
-
-      @keyframes shimmer {
-        0% {
-          background-position: 200% 0;
-        }
-        100% {
-          background-position: -200% 0;
-        }
-      }
-
-      .fade {
-        animation: fadeIn 0.4s cubic-bezier(0.25, 1, 0.5, 1) both;
-      }
-
-      .skeleton {
-        background: linear-gradient(
-          90deg,
-          var(--color-surface) 25%,
-          var(--color-border) 50%,
-          var(--color-surface) 75%
-        );
-        background-size: 200% 100%;
-        animation: shimmer 1.5s infinite;
-      }
     </style>
+
+    <script type="importmap">
+      {
+        "imports": {
+          "alpinejs": "https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/+esm"
+        }
+      }
+    </script>
   </head>
-  <body
-    x-data="ClipperApp"
-    @beforeunload.window="destroy()"
-    class="flex min-h-dvh flex-col select-none bg-bg text-text"
-  >
-    <main
-      class="mx-auto flex w-full max-w-md flex-1 flex-col overflow-y-auto px-5 pb-32"
-    >
-      <header class="fade pb-8 pt-10 text-center">
-        <h1 class="text-3xl font-bold tracking-tight">Clipper</h1>
-        <p class="mt-2 text-sm text-muted" x-text="statusText"></p>
+
+  <body class="app" x-data="ClipperApp" x-init="init()">
+    <main class="container">
+      <header class="hero fade">
+        <h1>Clipper</h1>
+        <p x-text="statusText"></p>
       </header>
 
-      <section class="fade space-y-3" style="animation-delay: 50ms">
-        <div class="relative">
-          <div
-            class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2"
-          >
-            <svg
-              class="h-5 w-5 text-muted"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
+      <section class="card fade">
+        <div class="card-inner top-widget">
+          <div class="top-widget-header">
+            <div class="section-title">
+              <h2>В топе</h2>
+              <span class="badge">Live</span>
+            </div>
+            <select
+              class="country-select"
+              x-model="topCountry"
+              @change="updateTopVideos()"
             >
+              <template x-for="country in topCountries" :key="country.code">
+                <option :value="country.code" x-text="country.name"></option>
+              </template>
+            </select>
+          </div>
+
+          <div class="pill-group">
+            <template x-for="p in PlatformRegistry.all()" :key="p.name">
+              <button
+                class="pill"
+                :class="{ active: topPlatform === p.name }"
+                @click="selectTopPlatform(p.name)"
+                type="button"
+              >
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  :style="{ color: p.colors?.icon || '#fff' }"
+                >
+                  <path :d="p.icon" />
+                </svg>
+                <span x-text="p.name"></span>
+              </button>
+            </template>
+          </div>
+
+          <div class="video-strip">
+            <template x-for="video in topVideos" :key="video.id">
+              <article class="video-card">
+                <div class="video-cover">
+                  <img :src="video.cover" :alt="video.title" loading="lazy" />
+                  <span x-text="video.duration"></span>
+                </div>
+                <div class="video-info">
+                  <h4 x-text="video.title"></h4>
+                  <div class="video-meta">
+                    <span x-text="video.author"></span>
+                    <span x-text="video.views + ' просмотров'"></span>
+                  </div>
+                </div>
+              </article>
+            </template>
+          </div>
+        </div>
+      </section>
+
+      <section class="fade">
+        <div class="input-wrap">
+          <div class="input-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
               <path
+                d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
+                stroke="currentColor"
+                stroke-width="1.5"
                 stroke-linecap="round"
                 stroke-linejoin="round"
-                d="M13.19 8.688a4.5 4.5 0 0 1 1.242 7.244l-4.5 4.5a4.5 4.5 0 0 1-6.364-6.364l1.757-1.757m13.35-.622 1.757-1.757a4.5 4.5 0 0 0-6.364-6.364l-4.5 4.5a4.5 4.5 0 0 0 1.242 7.244"
               />
             </svg>
           </div>
           <input
+            class="input"
             type="url"
-            x-ref="input"
             x-model="url"
-            @input.debounce.300ms="detect()"
-            @paste="$nextTick(() => detect())"
-            @keydown.enter.prevent="download"
-            :disabled="isLoading"
             placeholder="Вставьте ссылку на видео"
             autocomplete="off"
             autocorrect="off"
             autocapitalize="off"
             spellcheck="false"
-            class="h-14 w-full rounded-2xl border border-border bg-surface pl-12 pr-14 text-text transition-colors placeholder:text-muted focus:border-text/20 disabled:opacity-40"
+            @input.debounce.300ms="detect()"
+            @keydown.enter.prevent="download"
+            :disabled="isLoading"
           />
-          <div
-            class="absolute right-4 top-1/2 flex -translate-y-1/2 items-center gap-2"
+          <button
+            x-show="url.length"
+            class="clear-btn"
+            @click="clear"
+            type="button"
+            aria-label="Очистить"
           >
-            <button
-              x-show="url.length > 0"
-              x-transition:enter="transition duration-100 ease-out"
-              x-transition:enter-start="scale-90 opacity-0"
-              x-transition:enter-end="scale-100 opacity-100"
-              x-transition:leave="transition duration-75 ease-in"
-              x-transition:leave-start="scale-100 opacity-100"
-              x-transition:leave-end="scale-90 opacity-0"
-              @click="clear"
-              :disabled="isLoading"
-              class="grid h-8 w-8 place-items-center rounded-full bg-border transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80 disabled:opacity-40"
-              type="button"
-            >
-              <svg
-                class="h-4 w-4 text-muted"
-                fill="none"
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
+              <path
+                d="M6 18L18 6M6 6l12 12"
                 stroke="currentColor"
                 stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M6 18L18 6M6 6l12 12"
-                />
-              </svg>
-            </button>
-          </div>
+                stroke-linecap="round"
+              />
+            </svg>
+          </button>
         </div>
 
         <button
           x-show="platform && !isLoading && !video"
-          x-transition.opacity.duration.150ms
+          class="primary-btn"
           @click="download"
-          :disabled="isLoading"
-          :style="{ backgroundColor: platform?.colors?.primary }"
-          class="flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl font-semibold text-white transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80 disabled:opacity-40"
           type="button"
+          :style="{ background: platform?.colors?.primary || 'var(--accent)' }"
         >
-          <svg
-            class="h-5 w-5"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            viewBox="0 0 24 24"
-          >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
             <path
+              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
+              stroke="currentColor"
+              stroke-width="2"
               stroke-linecap="round"
               stroke-linejoin="round"
-              d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
             />
           </svg>
           <span>Сохранить видео</span>
         </button>
       </section>
 
-      <template x-if="isLoading">
-        <section
-          class="fade flex flex-1 flex-col items-center justify-center py-20"
-        >
-          <div class="mb-6 w-full max-w-60">
-            <div class="mb-3 flex items-center justify-between">
-              <span class="text-sm font-semibold text-text">Загрузка</span>
-              <span
-                class="text-sm font-semibold text-text"
-                x-text="progress + '%'"
-              ></span>
+      <section class="fade" x-show="isLoading">
+        <div class="card">
+          <div class="card-inner progress">
+            <div class="section-title">
+              <h2>Загрузка</h2>
+              <span x-text="progress + '%'"></span>
             </div>
-            <div
-              class="h-2 overflow-hidden rounded-full border border-border bg-surface"
-            >
+            <div class="progress-bar">
               <div
-                class="h-full rounded-full transition-all duration-200 ease-out"
-                :style="{ backgroundColor: platform?.colors?.progress, width: progress + '%' }"
+                class="progress-fill"
+                :style="{ width: progress + '%', background: platform?.colors?.progress || 'var(--accent)' }"
               ></div>
             </div>
+            <p class="footer" x-text="loadingText"></p>
           </div>
-          <p class="text-sm text-muted" x-text="loadingText"></p>
-        </section>
-      </template>
+        </div>
+      </section>
 
-      <template x-if="error && !isLoading">
-        <section
-          x-ref="errorSection"
-          x-effect="if (error && !isLoading) scrollToError()"
-          class="fade mt-6 rounded-2xl border border-red-900/40 bg-red-950/60 p-4"
-        >
-          <div class="flex items-start gap-3">
-            <div
-              class="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-red-100"
-            >
-              <svg
-                class="h-5 w-5 text-red-500"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 9v3.75m9-.75a9 9 0 1 1-18 0 9 9 0 0 1 18 0zm-9 3.75h.008v.008H12v-.008z"
-                />
-              </svg>
-            </div>
-            <div class="min-w-0 flex-1 pt-0.5">
-              <p class="text-sm font-semibold text-gray-600">Ошибка</p>
-              <p class="mt-0.5 text-sm text-gray-500" x-text="error"></p>
-            </div>
-          </div>
-        </section>
-      </template>
+      <section class="fade" x-show="error && !isLoading">
+        <div class="error" x-text="error"></div>
+      </section>
 
-      <template x-if="video && !isLoading">
-        <section class="fade mt-6 space-y-4">
-          <div
-            class="overflow-hidden rounded-2xl border border-border bg-surface"
-          >
-            <div class="relative h-[56dvh] w-full bg-black">
-              <video
-                x-ref="videoPlayer"
-                :src="currentVideoUrl"
-                :poster="video.cover"
-                :key="selectedQuality"
-                @loadeddata="$el.currentTime = 0"
-                class="absolute inset-0 h-full w-full object-contain"
-                controls
-                playsinline
-                webkit-playsinline
-              ></video>
-              <div
-                class="absolute left-3 top-3 flex items-center gap-1.5 rounded-lg bg-black/70 backdrop-blur px-2.5 py-1.5 shadow-sm"
-              >
-                <svg
-                  class="h-4 w-4"
-                  :style="{ color: platform?.colors?.icon }"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                >
-                  <path :d="platform?.icon" />
-                </svg>
-                <span
-                  class="text-xs font-semibold text-text"
-                  x-text="platform?.name"
-                ></span>
-              </div>
-              <div
-                class="absolute right-3 top-3 flex items-center justify-center rounded-lg bg-black/70 backdrop-blur px-2.5 py-1.5 shadow-sm"
-              >
-                <span
-                  class="text-xs font-semibold leading-none text-text"
-                  x-text="NumberFormatter.formatDuration(video.duration)"
-                ></span>
-              </div>
-              <div
-                class="absolute bottom-3 right-3 flex items-center justify-center rounded-lg bg-black/70 backdrop-blur px-2.5 py-1.5 shadow-sm"
-              >
-                <span
-                  class="text-xs font-semibold leading-none text-text"
-                  x-text="currentQualityLabel"
-                ></span>
-              </div>
-            </div>
-          </div>
-
-          <div
-            x-show="hasMultipleQualities && !isChangingQuality"
-            x-transition
-            class="flex gap-2"
-          >
-            <template x-for="q in availableQualities" :key="q.key">
-              <button
-                @click="selectQuality(q.key)"
-                :disabled="isChangingQuality"
-                :class="selectedQuality === q.key ? 'border-border bg-white text-black' : 'border-border bg-surface text-text'"
-                class="flex-1 rounded-xl border py-2.5 text-sm font-semibold transition-all duration-75 ease-out active:scale-[0.97] disabled:opacity-50"
-                x-text="q.label"
-              ></button>
-            </template>
-          </div>
-
-          <div
-            x-show="isChangingQuality"
-            class="flex items-center justify-center gap-2 py-2.5"
-          >
+      <section class="fade" x-show="video && !isLoading">
+        <div class="video-wrap">
+          <video
+            :src="currentVideoUrl"
+            :poster="video.cover"
+            controls
+            playsinline
+          ></video>
+          <div class="overlay-chip">
             <svg
-              class="h-4 w-4 animate-spin text-muted"
-              fill="none"
+              width="14"
+              height="14"
               viewBox="0 0 24 24"
+              fill="currentColor"
+              :style="{ color: platform?.colors?.icon }"
             >
-              <circle
-                class="opacity-25"
-                cx="12"
-                cy="12"
-                r="10"
-                stroke="currentColor"
-                stroke-width="4"
-              ></circle>
-              <path
-                class="opacity-75"
-                fill="currentColor"
-                d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
-              ></path>
+              <path :d="platform?.icon" />
             </svg>
-            <span class="text-sm text-muted">Смена качества...</span>
+            <span x-text="platform?.name"></span>
           </div>
+          <div class="overlay-chip right" style="top: 12px">
+            <span x-text="NumberFormatter.formatDuration(video.duration)"></span>
+          </div>
+          <div class="overlay-chip right" style="top: 44px">
+            <span x-text="currentQualityLabel"></span>
+          </div>
+        </div>
 
-          <button
-            @click="openAuthorProfile"
-            class="flex w-full items-center gap-3 rounded-2xl border border-border bg-surface p-4 text-left transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80"
-          >
+        <div
+          class="pill-group"
+          x-show="hasMultipleQualities && !isChangingQuality"
+        >
+          <template x-for="q in availableQualities" :key="q.key">
+            <button
+              class="pill"
+              :class="{ active: selectedQuality === q.key }"
+              @click="selectQuality(q.key)"
+              type="button"
+            >
+              <span x-text="q.label"></span>
+            </button>
+          </template>
+        </div>
+
+        <div class="card" x-show="video?.author">
+          <div class="card-inner sponsor-card">
             <img
               :src="video.author?.avatar"
               :alt="video.author?.nickname"
               @error="if ($event.target.src !== AppAssets.avatar) $event.target.src = AppAssets.avatar"
-              class="h-12 w-12 rounded-full border border-border object-cover"
             />
-            <div class="min-w-0 flex-1">
-              <p
-                class="truncate font-semibold text-text"
-                x-text="video.author?.nickname || 'Неизвестный автор'"
-              ></p>
-              <p
-                class="truncate text-sm text-muted"
-                x-text="video.author?.unique_id ? '@' + video.author.unique_id : ''"
-              ></p>
+            <div>
+              <div x-text="video.author?.nickname || 'Неизвестный автор'"></div>
+              <div class="footer" x-text="video.author?.unique_id ? '@' + video.author.unique_id : ''"></div>
             </div>
-            <svg
-              class="h-5 w-5 shrink-0"
-              :style="{ color: platform?.colors?.icon }"
-              viewBox="0 0 24 24"
-              fill="currentColor"
-            >
-              <path :d="platform?.icon" />
-            </svg>
-            <svg
-              class="h-4 w-4 shrink-0 text-muted"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="m8.25 4.5 7.5 7.5-7.5 7.5"
-              />
-            </svg>
-          </button>
-
-          <template x-if="video.title">
-            <div class="rounded-2xl border border-border bg-surface p-4">
-              <div class="mb-2 flex items-center gap-2">
-                <svg
-                  class="h-4 w-4 text-muted"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="M4.5 6.75h15M4.5 12h15M4.5 17.25h9"
-                  />
-                </svg>
-                <span
-                  class="text-xs font-semibold uppercase tracking-wide text-muted"
-                  >Описание</span
-                >
-              </div>
-              <p
-                class="text-sm leading-relaxed text-text"
-                x-text="video.title"
-              ></p>
-            </div>
-          </template>
-
-          <template x-if="visibleStats.length > 0">
-            <div
-              class="grid gap-2 rounded-2xl border border-border bg-surface p-3"
-              :style="{ gridTemplateColumns: 'repeat(' + visibleStats.length + ', minmax(0, 1fr))' }"
-            >
-              <template x-for="stat in visibleStats" :key="stat.key">
-                <div class="py-2 text-center">
-                  <div
-                    class="mx-auto grid h-9 w-9 place-items-center rounded-full"
-                    :style="{ backgroundColor: platform?.colors?.statsBg }"
-                  >
-                    <svg
-                      class="h-4 w-4"
-                      :style="{ color: platform?.colors?.statsIcon }"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="1.5"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        :d="stat.icon"
-                      />
-                    </svg>
-                  </div>
-                  <p
-                    class="mt-1 text-sm font-semibold text-text"
-                    x-text="NumberFormatter.formatCompact(video[stat.key])"
-                  ></p>
-                  <p
-                    class="mt-0.5 text-[10px] text-muted"
-                    x-text="stat.label"
-                  ></p>
-                </div>
-              </template>
-            </div>
-          </template>
-
-          <div class="grid grid-cols-2 gap-3 pt-2">
-            <button
-              @click="saveVideo"
-              :disabled="!currentVideoUrl || isSaving"
-              :style="{ backgroundColor: platform?.colors?.save }"
-              class="flex h-14 items-center justify-center gap-2 rounded-2xl font-semibold text-white transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <svg
-                class="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M3 16.5v2.25A2.25 2.25 0 0 0 5.25 21h13.5A2.25 2.25 0 0 0 21 18.75V16.5M16.5 12 12 16.5m0 0L7.5 12m4.5 4.5V3"
-                />
-              </svg>
-              <span>Сохранить</span>
-            </button>
-            <button
-              @click="shareStory"
-              :disabled="!currentVideoUrl"
-              :style="{ backgroundColor: platform?.colors?.story }"
-              class="flex h-14 items-center justify-center gap-2 rounded-2xl font-semibold text-black transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
-            >
-              <svg
-                class="h-5 w-5"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                />
-              </svg>
-              <span>В историю</span>
+            <button class="ghost-btn" @click="openAuthorProfile" type="button">
+              Профиль
             </button>
           </div>
+        </div>
 
-          <button
-            @click="shareLink"
-            :disabled="!video || !platform"
-            class="flex h-14 w-full items-center justify-center gap-2.5 rounded-2xl border border-border bg-surface font-semibold text-text transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80 disabled:cursor-not-allowed disabled:opacity-40"
+        <div class="stats-grid" x-show="visibleStats.length">
+          <div
+            class="stats-row"
+            :style="{ gridTemplateColumns: 'repeat(' + visibleStats.length + ', minmax(0,1fr))' }"
           >
-            <svg
-              class="h-5 w-5 text-muted"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M7.217 10.907a2.25 2.25 0 1 0 0 2.186m0-2.186c.18.324.283.696.283 1.093s-.103.77-.283 1.093m0-2.186 9.566-5.314m-9.566 7.5 9.566 5.314m0 0a2.25 2.25 0 1 0 3.935 2.186 2.25 2.25 0 0 0-3.935-2.186Zm0-12.814a2.25 2.25 0 1 0 3.933-2.185 2.25 2.25 0 0 0-3.933 2.185Z"
-              />
-            </svg>
-            <span>Поделиться ссылкой</span>
-          </button>
-        </section>
-      </template>
+            <template x-for="stat in visibleStats" :key="stat.key">
+              <div class="stat">
+                <svg
+                  width="18"
+                  height="18"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  :style="{ color: platform?.colors?.statsIcon }"
+                >
+                  <path
+                    :d="stat.icon"
+                    stroke="currentColor"
+                    stroke-width="1.5"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+                <h4 x-text="NumberFormatter.formatCompact(video[stat.key])"></h4>
+                <p x-text="stat.label"></p>
+              </div>
+            </template>
+          </div>
+        </div>
 
-      <template x-if="!isLoading && !video">
-        <section
-          x-ref="sponsorSection"
-          x-show="sponsorsLoading || unsubscribedSponsors.length > 0"
-          x-transition:enter="transition-all duration-300 ease-out"
-          x-transition:enter-start="max-h-0 overflow-hidden opacity-0"
-          x-transition:enter-end="max-h-[500px] opacity-100"
-          x-transition:leave="transition-all duration-300 ease-in"
-          x-transition:leave-start="max-h-[500px] opacity-100"
-          x-transition:leave-end="max-h-0 overflow-hidden opacity-0"
-          class="fade mt-8"
-          style="animation-delay: 120ms"
+        <div class="pill-group">
+          <button
+            class="primary-btn"
+            @click="saveVideo"
+            :disabled="!currentVideoUrl || isSaving"
+            :style="{ background: platform?.colors?.save || 'var(--accent)' }"
+            type="button"
+          >
+            Сохранить
+          </button>
+          <button
+            class="primary-btn"
+            @click="shareStory"
+            :disabled="!currentVideoUrl"
+            :style="{ background: platform?.colors?.story || '#f7f7f7', color: '#111' }"
+            type="button"
+          >
+            В историю
+          </button>
+        </div>
+
+        <button
+          class="secondary-btn"
+          @click="shareLink"
+          :disabled="!video || !platform"
+          type="button"
         >
-          <div class="mb-4 flex items-center gap-2">
-            <svg
-              class="h-5 w-5 text-muted"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="1.5"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M9.813 15.904 9 18.75l-.813-2.846a4.5 4.5 0 0 0-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 0 0 3.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 0 0 3.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 0 0-3.09 3.09ZM18.259 8.715 18 9.75l-.259-1.035a3.375 3.375 0 0 0-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 0 0 2.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 0 0 2.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 0 0-2.456 2.456ZM16.894 20.567 16.5 21.75l-.394-1.183a2.25 2.25 0 0 0-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 0 0 1.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 0 0 1.423 1.423l1.183.394-1.183.394a2.25 2.25 0 0 0-1.423 1.423Z"
-              />
-            </svg>
-            <h2 class="font-semibold text-text">Подпишитесь на спонсоров</h2>
-          </div>
+          Поделиться ссылкой
+        </button>
+      </section>
 
-          <p class="mb-4 text-sm text-muted">
-            Для загрузки видео подпишитесь на каналы спонсоров
-          </p>
-
-          <template x-if="sponsorsLoading">
-            <div
-              class="grid gap-3"
-              :class="{ 'grid-cols-1': sponsorsCount === 1, 'grid-cols-2': sponsorsCount === 2, 'grid-cols-3': sponsorsCount >= 3 }"
-            >
-              <template x-for="i in sponsorsCount" :key="i">
-                <div
-                  class="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-4"
-                >
-                  <div class="skeleton h-14 w-14 rounded-full"></div>
-                  <div class="skeleton h-4 w-16 rounded"></div>
-                  <div class="skeleton h-3 w-12 rounded"></div>
-                </div>
-              </template>
-            </div>
-          </template>
-
-          <template x-if="!sponsorsLoading">
-            <div
-              class="grid gap-3"
-              :class="{ 'grid-cols-1': unsubscribedSponsors.length === 1, 'grid-cols-2': unsubscribedSponsors.length === 2, 'grid-cols-3': unsubscribedSponsors.length >= 3 }"
-            >
-              <template
-                x-for="sponsor in unsubscribedSponsors"
-                :key="sponsor.username"
-              >
-                <button
-                  @click="openSponsor(sponsor.username)"
-                  class="flex flex-col items-center gap-3 rounded-2xl border border-border bg-surface p-4 text-center transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80"
-                >
-                  <img
-                    :src="sponsor.photo"
-                    :alt="sponsor.title"
-                    @error="if ($event.target.src !== AppAssets.sponsor) $event.target.src = AppAssets.sponsor"
-                    class="h-14 w-14 rounded-full border-2 border-border object-cover"
-                  />
-                  <div class="w-full min-w-0">
-                    <p
-                      class="truncate text-sm font-semibold text-text"
-                      x-text="sponsor.title"
-                    ></p>
-                    <p
-                      class="truncate text-xs text-muted"
-                      x-text="'@' + sponsor.username"
-                    ></p>
-                  </div>
-                </button>
-              </template>
-            </div>
-          </template>
-
-          <button
-            @click="refreshSubscriptions"
-            :disabled="sponsorsLoading"
-            class="mt-4 flex h-12 w-full items-center justify-center gap-2 rounded-2xl border border-border bg-surface font-semibold text-text transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80 disabled:opacity-40"
-          >
-            <svg
-              class="h-5 w-5 text-muted"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182m0-4.991v4.99"
-              />
-            </svg>
-            <span>Проверить подписки</span>
-          </button>
-        </section>
-      </template>
-
-      <template x-if="!isLoading && !video">
-        <section class="fade mt-8" style="animation-delay: 100ms">
-          <div class="mb-4 flex items-center justify-between">
-            <div class="flex items-center gap-2">
-              <svg
-                class="h-5 w-5 text-muted"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="1.5"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  d="M12 6v6h4.5m4.5 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"
-                />
-              </svg>
-              <h2 class="font-semibold text-text">Недавние видео</h2>
-            </div>
-            <button
-              x-show="history.length > 0"
-              @click="clearHistory"
-              class="text-sm text-muted transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80"
-            >
-              Очистить
-            </button>
-          </div>
-
-          <p class="mb-4 text-sm text-muted">
-            Синхронизируются между всеми вашими устройствами
-          </p>
-
-          <template x-if="history.length === 0">
-            <div
-              class="rounded-2xl border border-border bg-surface p-6 text-center"
-            >
-              <div
-                class="mx-auto mb-4 grid h-14 w-14 place-items-center rounded-full bg-border"
-              >
-                <svg
-                  class="h-7 w-7 text-muted"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="1.5"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    d="m15.75 10.5 4.72-4.72a.75.75 0 0 1 1.28.53v11.38a.75.75 0 0 1-1.28.53l-4.72-4.72M4.5 18.75h9a2.25 2.25 0 0 0 2.25-2.25v-9a2.25 2.25 0 0 0-2.25-2.25h-9A2.25 2.25 0 0 0 2.25 7.5v9a2.25 2.25 0 0 0 2.25 2.25Z"
-                  />
-                </svg>
-              </div>
-              <p class="font-semibold text-text">История пуста</p>
-              <p class="mt-1 text-sm text-muted">
-                Сохраните видео, чтобы оно появилось здесь
-              </p>
-            </div>
-          </template>
-
-          <template x-if="history.length > 0">
-            <div
-              class="-mx-5 flex gap-3 overflow-x-auto px-5 pb-2 [-webkit-overflow-scrolling:touch] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
-            >
-              <template x-for="item in history" :key="item.id">
-                <button
-                  @click="loadFromHistory(item)"
-                  class="w-[88px] shrink-0 transition-all duration-75 ease-out active:scale-[0.97] active:opacity-80"
-                >
-                  <div
-                    class="relative mb-2 h-[120px] w-[88px] overflow-hidden rounded-xl border border-border"
-                  >
-                    <img
-                      :src="item.cover"
-                      @error="if ($event.target.src !== AppAssets.cover) $event.target.src = AppAssets.cover"
-                      class="h-full w-full object-cover"
-                      loading="lazy"
-                    />
-                    <div
-                      class="absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-black/60 to-transparent"
-                    ></div>
-                    <div
-                      class="absolute bottom-2 left-2 grid h-5 w-5 place-items-center rounded-full bg-black"
-                    >
-                      <svg
-                        class="h-3 w-3"
-                        :style="{ color: PlatformRegistry.get(item.platform)?.colors?.icon }"
-                        viewBox="0 0 24 24"
-                        fill="currentColor"
-                      >
-                        <path :d="PlatformRegistry.get(item.platform)?.icon" />
-                      </svg>
-                    </div>
-                    <div
-                      x-show="item.quality"
-                      class="absolute bottom-2 right-2 flex items-center"
-                    >
-                      <span
-                        class="text-[9px] font-semibold leading-none tracking-wide text-white drop-shadow-sm"
-                        x-text="item.quality?.toUpperCase()"
-                      ></span>
-                    </div>
-                  </div>
-                  <p
-                    class="truncate text-left text-xs text-muted"
-                    x-text="item.author"
-                  ></p>
-                </button>
-              </template>
-            </div>
-          </template>
-        </section>
-      </template>
-
-      <footer
-        class="fade mt-auto pt-12"
-        style="animation-delay: 150ms"
-        x-show="!isLoading && !video"
-      >
-        <p class="mb-4 text-center text-sm text-muted">
-          Поддерживаемые платформы
+      <section class="fade" x-show="!isLoading && !video">
+        <div class="section-title">
+          <h2>Спонсоры</h2>
+          <span class="badge" x-text="unconfirmedSponsors.length + ' осталось'"></span>
+        </div>
+        <p class="footer">
+          Для доступа к загрузке откройте каналы и подтвердите подписку
         </p>
-        <div class="flex flex-wrap justify-center gap-3">
-          <template x-for="p in PlatformRegistry.all()" :key="p.name">
-            <div
-              class="flex items-center gap-2.5 rounded-xl border border-border bg-surface px-5 py-3"
-            >
-              <svg
-                class="h-5 w-5"
-                :style="{ color: p.colors?.icon }"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path :d="p.icon" />
-              </svg>
-              <span
-                class="text-sm font-semibold text-text"
-                x-text="p.name"
-              ></span>
+
+        <div class="sponsor-grid">
+          <template x-for="sponsor in sponsorsList" :key="sponsor.username">
+            <div class="sponsor-card">
+              <img
+                :src="sponsor.photo"
+                :alt="sponsor.title"
+                @error="if ($event.target.src !== AppAssets.sponsor) $event.target.src = AppAssets.sponsor"
+              />
+              <div>
+                <div x-text="sponsor.title"></div>
+                <div class="footer" x-text="'@' + sponsor.username"></div>
+                <div class="sponsor-actions">
+                  <button
+                    class="ghost-btn"
+                    @click="openSponsor(sponsor.username)"
+                    type="button"
+                  >
+                    Открыть
+                  </button>
+                  <button
+                    class="ghost-btn"
+                    @click="confirmSponsor(sponsor.username)"
+                    type="button"
+                    :disabled="!canConfirmSponsor(sponsor.username)"
+                  >
+                    Я подписался
+                  </button>
+                </div>
+              </div>
+              <div class="success" x-show="isSponsorConfirmed(sponsor.username)">
+                ✓
+              </div>
             </div>
           </template>
         </div>
+      </section>
 
-        <template x-if="TelegramWebApp.canAddToHomeScreen">
-          <button
-            @click="TelegramWebApp.addToHomeScreen()"
-            class="mx-auto mt-6 flex items-center gap-1.5 border-0 bg-transparent p-0 text-sm font-medium text-muted transition-opacity duration-75 active:opacity-60 hidden"
-          >
-            <svg
-              class="h-4 w-4 text-muted"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                d="M12 4.5v15m7.5-7.5h-15"
-              />
-            </svg>
-            <span>Добавить на главный экран</span>
+      <section class="fade" x-show="!isLoading && !video">
+        <div class="section-title">
+          <h2>Недавние видео</h2>
+          <button class="ghost-btn" x-show="history.length" @click="clearHistory" type="button">
+            Очистить
           </button>
-        </template>
+        </div>
+
+        <div x-show="history.length === 0" class="card">
+          <div class="card-inner">
+            <p>История пуста</p>
+            <p class="footer">Сохраните видео, чтобы оно появилось здесь</p>
+          </div>
+        </div>
+
+        <div class="history-strip" x-show="history.length > 0">
+          <template x-for="item in history" :key="item.id">
+            <button class="history-card" @click="loadFromHistory(item)" type="button">
+              <div class="history-thumb">
+                <img
+                  :src="item.cover"
+                  @error="if ($event.target.src !== AppAssets.cover) $event.target.src = AppAssets.cover"
+                  loading="lazy"
+                />
+                <span x-text="item.quality?.toUpperCase()"></span>
+              </div>
+              <p class="footer" x-text="item.author"></p>
+            </button>
+          </template>
+        </div>
+      </section>
+
+      <footer class="footer fade" x-show="!isLoading && !video">
+        <p>Поддерживаемые платформы</p>
+        <div class="pill-group" style="justify-content: center; margin-top: 10px">
+          <template x-for="p in PlatformRegistry.all()" :key="p.name">
+            <div class="pill">
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+                :style="{ color: p.colors?.icon }"
+              >
+                <path :d="p.icon" />
+              </svg>
+              <span x-text="p.name"></span>
+            </div>
+          </template>
+        </div>
       </footer>
     </main>
 
     <script type="module">
-      import Alpine from "https://cdn.jsdelivr.net/npm/alpinejs@3.15.3/+esm";
+      import Alpine from "alpinejs";
 
       const AppConfig = Object.freeze({
         BOT_USERNAME: "ClipperAppBot",
-        API_MODE: "direct",
-        SERVER_URL: "",
-        BOT_API_URL: "",
         FETCH_TIMEOUT: 15000,
         PROGRESS_INTERVAL: 100,
         PROGRESS_STEP_MIN: 2,
@@ -814,16 +915,17 @@
         PROGRESS_LIMIT: 100,
         HISTORY_MAX: 20,
         HISTORY_KEY: "clipper_history",
-        SPONSORS: [],
+        SPONSORS_KEY: "clipper_sponsors_v1",
+        SPONSOR_TTL_HOURS: 168
       });
 
       const AppAssets = Object.freeze({
         avatar:
-          "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22><rect fill=%22%23e5e5e5%22 width=%2248%22 height=%2248%22/></svg>",
+          "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22><rect fill=%22%2333333a%22 width=%2248%22 height=%2248%22/></svg>",
         cover:
-          "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 88 120%22><rect fill=%22%23e5e5e5%22 width=%2288%22 height=%22120%22/></svg>",
+          "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 88 120%22><rect fill=%22%2333333a%22 width=%2288%22 height=%22120%22/></svg>",
         sponsor:
-          "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22><defs><linearGradient id=%22g%22 x1=%220%25%22 y1=%220%25%22 x2=%22100%25%22 y2=%22100%25%22><stop offset=%220%25%22 stop-color=%22%23667eea%22/><stop offset=%22100%25%22 stop-color=%22%23764ba2%22/></linearGradient></defs><rect fill=%22url(%23g)%22 width=%2248%22 height=%2248%22/></svg>",
+          "data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 48 48%22><rect fill=%22%237c5cff%22 width=%2248%22 height=%2248%22/></svg>",
       });
 
       class NumberFormatter {
@@ -854,10 +956,6 @@
       }
 
       class ErrorHandler {
-        static log(context, error) {
-          console.error(`[Clipper][${context}]`, error);
-        }
-
         static getMessage(error) {
           if (error?.name === "AbortError") return "Превышено время ожидания";
           if (error?.message) return error.message;
@@ -874,17 +972,12 @@
           try {
             const storage = this.cloudStorage;
             if (!storage) {
-              return (
-                JSON.parse(localStorage.getItem(AppConfig.HISTORY_KEY)) || []
-              );
+              return JSON.parse(localStorage.getItem(AppConfig.HISTORY_KEY)) || [];
             }
 
             return new Promise((resolve) => {
               storage.getItem(AppConfig.HISTORY_KEY, (err, value) => {
-                if (err || !value) {
-                  resolve([]);
-                  return;
-                }
+                if (err || !value) return resolve([]);
                 try {
                   resolve(JSON.parse(value) || []);
                 } catch {
@@ -898,73 +991,49 @@
         }
 
         static async add(item) {
-          try {
-            const storage = this.cloudStorage;
-            const list = (await this.getAll()).filter((i) => i.id !== item.id);
-            list.unshift(item);
-            const data = JSON.stringify(list.slice(0, AppConfig.HISTORY_MAX));
+          const list = (await this.getAll()).filter((i) => i.id !== item.id);
+          list.unshift(item);
+          const data = JSON.stringify(list.slice(0, AppConfig.HISTORY_MAX));
 
-            if (!storage) {
-              localStorage.setItem(AppConfig.HISTORY_KEY, data);
-              return;
-            }
-
-            return new Promise((resolve) => {
-              storage.setItem(AppConfig.HISTORY_KEY, data, (err) => {
-                if (err) ErrorHandler.log("HistoryStorage.add", err);
-                resolve();
-              });
-            });
-          } catch (err) {
-            ErrorHandler.log("HistoryStorage.add", err);
+          const storage = this.cloudStorage;
+          if (!storage) {
+            localStorage.setItem(AppConfig.HISTORY_KEY, data);
+            return;
           }
+
+          return new Promise((resolve) => {
+            storage.setItem(AppConfig.HISTORY_KEY, data, () => resolve());
+          });
         }
 
         static async updateQuality(id, quality) {
-          try {
-            const storage = this.cloudStorage;
-            const list = await this.getAll();
-            const item = list.find((i) => i.id === id);
+          const list = await this.getAll();
+          const item = list.find((i) => i.id === id);
+          if (!item) return;
+          item.quality = quality;
+          const data = JSON.stringify(list);
 
-            if (!item) return;
-
-            item.quality = quality;
-            const data = JSON.stringify(list);
-
-            if (!storage) {
-              localStorage.setItem(AppConfig.HISTORY_KEY, data);
-              return;
-            }
-
-            return new Promise((resolve) => {
-              storage.setItem(AppConfig.HISTORY_KEY, data, (err) => {
-                if (err) ErrorHandler.log("HistoryStorage.updateQuality", err);
-                resolve();
-              });
-            });
-          } catch (err) {
-            ErrorHandler.log("HistoryStorage.updateQuality", err);
+          const storage = this.cloudStorage;
+          if (!storage) {
+            localStorage.setItem(AppConfig.HISTORY_KEY, data);
+            return;
           }
+
+          return new Promise((resolve) => {
+            storage.setItem(AppConfig.HISTORY_KEY, data, () => resolve());
+          });
         }
 
         static async clear() {
-          try {
-            const storage = this.cloudStorage;
-
-            if (!storage) {
-              localStorage.removeItem(AppConfig.HISTORY_KEY);
-              return;
-            }
-
-            return new Promise((resolve) => {
-              storage.removeItem(AppConfig.HISTORY_KEY, (err) => {
-                if (err) ErrorHandler.log("HistoryStorage.clear", err);
-                resolve();
-              });
-            });
-          } catch (err) {
-            ErrorHandler.log("HistoryStorage.clear", err);
+          const storage = this.cloudStorage;
+          if (!storage) {
+            localStorage.removeItem(AppConfig.HISTORY_KEY);
+            return;
           }
+
+          return new Promise((resolve) => {
+            storage.removeItem(AppConfig.HISTORY_KEY, () => resolve());
+          });
         }
       }
 
@@ -976,466 +1045,147 @@
         static initialize() {
           const app = this.instance;
           if (!app) return;
+          app.ready();
+          app.disableVerticalSwipes?.();
+          app.setHeaderColor?.("#0b0b0f");
+          app.setBackgroundColor?.("#0b0b0f");
 
-          try {
-            app.ready();
-            app.requestFullscreen?.();
-            app.disableVerticalSwipes?.();
-            app.setHeaderColor?.("#0b0b0f");
-            app.setBackgroundColor?.("#0b0b0f");
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.initialize", err);
+          const theme = app.themeParams;
+          if (theme?.bg_color) {
+            document.documentElement.style.setProperty("--bg", theme.bg_color);
+          }
+          if (theme?.text_color) {
+            document.documentElement.style.setProperty("--text", theme.text_color);
+          }
+          if (theme?.hint_color) {
+            document.documentElement.style.setProperty("--muted", theme.hint_color);
           }
         }
 
         static get startParam() {
-          try {
-            return this.instance?.initDataUnsafe?.start_param || null;
-          } catch {
-            return null;
-          }
+          return this.instance?.initDataUnsafe?.start_param || null;
         }
 
         static get userId() {
-          try {
-            return this.instance?.initDataUnsafe?.user?.id || null;
-          } catch {
-            return null;
-          }
-        }
-
-        static get initData() {
-          try {
-            return this.instance?.initData || "";
-          } catch {
-            return "";
-          }
+          return this.instance?.initDataUnsafe?.user?.id || null;
         }
 
         static hapticImpact(style = "light") {
-          try {
-            this.instance?.HapticFeedback?.impactOccurred(style);
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.hapticImpact", err);
-          }
+          this.instance?.HapticFeedback?.impactOccurred(style);
         }
 
         static hapticNotification(type) {
-          try {
-            this.instance?.HapticFeedback?.notificationOccurred(type);
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.hapticNotification", err);
-          }
+          this.instance?.HapticFeedback?.notificationOccurred(type);
         }
 
         static downloadFile(url, filename) {
-          try {
-            if (!this.instance?.downloadFile) return false;
-            this.instance.downloadFile({ url, file_name: filename });
-            return true;
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.downloadFile", err);
-            return false;
-          }
+          if (!this.instance?.downloadFile) return false;
+          this.instance.downloadFile({ url, file_name: filename });
+          return true;
         }
 
         static shareToStory(mediaUrl, text) {
-          try {
-            if (!this.instance?.shareToStory) return false;
-            this.instance.shareToStory(mediaUrl, {
-              text: text || "",
-              widget_link: {
-                url: `https://t.me/${AppConfig.BOT_USERNAME}`,
-                name: "Clipper",
-              },
-            });
-            return true;
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.shareToStory", err);
-            return false;
-          }
+          if (!this.instance?.shareToStory) return false;
+          this.instance.shareToStory(mediaUrl, {
+            text: text || "",
+            widget_link: {
+              url: `https://t.me/${AppConfig.BOT_USERNAME}`,
+              name: "Clipper",
+            },
+          });
+          return true;
         }
 
         static openExternalLink(url) {
-          try {
-            if (this.instance?.openLink) {
-              this.instance.openLink(url);
-            } else {
-              globalThis.open(url, "_blank", "noopener,noreferrer");
-            }
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.openExternalLink", err);
-          }
+          if (this.instance?.openLink) this.instance.openLink(url);
+          else globalThis.open(url, "_blank", "noopener,noreferrer");
         }
 
         static openTelegramLink(url) {
-          try {
-            if (this.instance?.openTelegramLink) {
-              this.instance.openTelegramLink(url);
-            } else {
-              globalThis.open(url, "_blank", "noopener,noreferrer");
-            }
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.openTelegramLink", err);
-          }
+          if (this.instance?.openTelegramLink) this.instance.openTelegramLink(url);
+          else globalThis.open(url, "_blank", "noopener,noreferrer");
         }
 
         static shareUrl(url, text) {
-          try {
-            const shareLink = `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text || "")}`;
-            this.openTelegramLink(shareLink);
-            return true;
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.shareUrl", err);
-            return false;
-          }
+          const shareLink = `https://t.me/share/url?url=${encodeURIComponent(
+            url
+          )}&text=${encodeURIComponent(text || "")}`;
+          this.openTelegramLink(shareLink);
+          return true;
         }
 
         static showConfirm(message, callback) {
-          try {
-            if (this.instance?.showConfirm) {
-              this.instance.showConfirm(message, callback);
-              return true;
-            }
-            const result = confirm(message);
-            callback(result);
-            return true;
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.showConfirm", err);
-            const result = confirm(message);
-            callback(result);
-            return false;
+          if (this.instance?.showConfirm) {
+            this.instance.showConfirm(message, callback);
+            return;
           }
+          callback(confirm(message));
         }
+      }
 
-        static requestWriteAccess() {
+      const SponsorService = {
+        sponsors: [
+          {
+            username: "telegram",
+            title: "Telegram",
+            photo:
+              "https://images.unsplash.com/photo-1522202176988-66273c2fd55f?q=80&w=200&auto=format&fit=crop",
+          },
+          {
+            username: "durov",
+            title: "Pavel Durov",
+            photo:
+              "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=200&auto=format&fit=crop",
+          },
+          {
+            username: "tiktok",
+            title: "TikTok",
+            photo:
+              "https://images.unsplash.com/photo-1487412912498-0447578fcca8?q=80&w=200&auto=format&fit=crop",
+          },
+        ],
+        getState() {
+          const raw = localStorage.getItem(AppConfig.SPONSORS_KEY);
           try {
-            if (this.instance?.requestWriteAccess) {
-              this.instance.requestWriteAccess();
-              return true;
-            }
-            return false;
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.requestWriteAccess", err);
-            return false;
-          }
-        }
-
-        static addToHomeScreen() {
-          try {
-            if (this.instance?.addToHomeScreen) {
-              this.instance.addToHomeScreen();
-              return true;
-            }
-            return false;
-          } catch (err) {
-            ErrorHandler.log("TelegramWebApp.addToHomeScreen", err);
-            return false;
-          }
-        }
-
-        static get canAddToHomeScreen() {
-          try {
-            return typeof this.instance?.addToHomeScreen === "function";
+            return raw ? JSON.parse(raw) : {};
           } catch {
-            return false;
+            return {};
           }
-        }
-
-        static get canRequestWriteAccess() {
-          try {
-            return typeof this.instance?.requestWriteAccess === "function";
-          } catch {
-            return false;
-          }
-        }
-      }
-
-      class ApiClient {
-        static async request(endpoint, data = {}) {
-          const url = this.buildUrl(endpoint);
-          const options = this.buildOptions(data);
-
-          const controller = new AbortController();
-          const timeoutId = setTimeout(
-            () => controller.abort(),
-            AppConfig.FETCH_TIMEOUT,
-          );
-
-          try {
-            const response = await fetch(url, {
-              ...options,
-              signal: controller.signal,
-            });
-
-            if (!response.ok) {
-              throw new Error(`HTTP ${response.status}`);
-            }
-
-            return await response.json();
-          } catch (err) {
-            ErrorHandler.log("ApiClient.request", err);
-            throw err;
-          } finally {
-            clearTimeout(timeoutId);
-          }
-        }
-
-        static buildUrl(endpoint) {
-          if (AppConfig.API_MODE === "server") {
-            return `${AppConfig.SERVER_URL}/${endpoint}`;
-          }
-          return `${AppConfig.BOT_API_URL}/${endpoint}`;
-        }
-
-        static buildOptions(data) {
-          const options = {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
+        },
+        saveState(state) {
+          localStorage.setItem(AppConfig.SPONSORS_KEY, JSON.stringify(state));
+        },
+        markOpened(username) {
+          const state = this.getState();
+          state[username] = {
+            ...state[username],
+            openedAt: Date.now(),
           };
-
-          if (AppConfig.API_MODE === "server") {
-            options.body = JSON.stringify({
-              ...data,
-              initData: TelegramWebApp.initData,
-            });
-          } else {
-            options.body = JSON.stringify(data);
-          }
-
-          return options;
-        }
-      }
-
-      class SponsorApiService {
-        static channelCache = new Map();
-        static subscriptionCache = new Map();
-        static CACHE_TTL = 5 * 60 * 1000;
-        static cacheTimestamps = new Map();
-
-        static getCachedChannel(username) {
-          const cached = this.channelCache.get(username);
-          const timestamp = this.cacheTimestamps.get(`channel_${username}`);
-          if (cached && timestamp && Date.now() - timestamp < this.CACHE_TTL) {
-            return cached;
-          }
-          this.channelCache.delete(username);
-          this.cacheTimestamps.delete(`channel_${username}`);
-          return null;
-        }
-
-        static setCachedChannel(username, data) {
-          this.channelCache.set(username, data);
-          this.cacheTimestamps.set(`channel_${username}`, Date.now());
-        }
-
-        static getCachedSubscription(cacheKey) {
-          const cached = this.subscriptionCache.get(cacheKey);
-          const timestamp = this.cacheTimestamps.get(`sub_${cacheKey}`);
-          if (
-            cached !== undefined &&
-            timestamp &&
-            Date.now() - timestamp < this.CACHE_TTL
-          ) {
-            return cached;
-          }
-          this.subscriptionCache.delete(cacheKey);
-          this.cacheTimestamps.delete(`sub_${cacheKey}`);
-          return undefined;
-        }
-
-        static setCachedSubscription(cacheKey, value) {
-          this.subscriptionCache.set(cacheKey, value);
-          this.cacheTimestamps.set(`sub_${cacheKey}`, Date.now());
-        }
-
-        static getSponsors() {
-          return AppConfig.SPONSORS.slice(0, 3);
-        }
-
-        static async fetchChannelInfo(username) {
-          const cleanUsername = username.replace(/^@/, "").trim();
-          const cached = this.getCachedChannel(cleanUsername);
-          if (cached) return cached;
-
-          try {
-            if (AppConfig.API_MODE === "server") {
-              return await this.fetchChannelFromServer(cleanUsername);
-            }
-            return await this.fetchChannelDirect(cleanUsername);
-          } catch (err) {
-            ErrorHandler.log("SponsorApiService.fetchChannelInfo", err);
-            return this.createFallbackChannel(cleanUsername);
-          }
-        }
-
-        static async fetchChannelFromServer(username) {
-          const result = await ApiClient.request("sponsors/channel", {
-            username,
-          });
-          if (!result.ok) throw new Error("Channel not found");
-
-          const channelData = {
-            username,
-            title: result.data.title || username,
-            photo: result.data.photo || AppAssets.sponsor,
+          this.saveState(state);
+        },
+        confirm(username) {
+          const state = this.getState();
+          const now = Date.now();
+          state[username] = {
+            ...state[username],
+            confirmedAt: now,
           };
-
-          this.setCachedChannel(username, channelData);
-          return channelData;
+          this.saveState(state);
+        },
+        isConfirmed(username) {
+          const state = this.getState();
+          const info = state[username];
+          if (!info?.confirmedAt) return false;
+          const ttl = AppConfig.SPONSOR_TTL_HOURS * 60 * 60 * 1000;
+          return Date.now() - info.confirmedAt < ttl;
+        },
+        canConfirm(username) {
+          const state = this.getState();
+          const info = state[username];
+          if (!info?.openedAt) return false;
+          return Date.now() - info.openedAt < 10 * 60 * 1000;
         }
-
-        static async fetchChannelDirect(username) {
-          const chat = await ApiClient.request("getChat", {
-            chat_id: `@${username}`,
-          });
-          if (!chat.ok || !chat.result) throw new Error("Channel not found");
-
-          let photoUrl = AppAssets.sponsor;
-
-          if (chat.result.photo?.big_file_id) {
-            const file = await ApiClient.request("getFile", {
-              file_id: chat.result.photo.big_file_id,
-            });
-
-            if (file.ok && file.result?.file_path) {
-              const botToken = AppConfig.BOT_API_URL.split("/bot")[1];
-              photoUrl = `https://api.telegram.org/file/bot${botToken}/${file.result.file_path}`;
-            }
-          }
-
-          const channelData = {
-            username,
-            title: chat.result.title || username,
-            photo: photoUrl,
-          };
-
-          this.setCachedChannel(username, channelData);
-          return channelData;
-        }
-
-        static createFallbackChannel(username) {
-          return {
-            username,
-            title: username,
-            photo: AppAssets.sponsor,
-          };
-        }
-
-        static async checkSubscription(username) {
-          const userId = TelegramWebApp.userId;
-          if (!userId) return false;
-
-          const cleanUsername = username.replace(/^@/, "").trim();
-          const cacheKey = `${userId}_${cleanUsername}`;
-          const cached = this.getCachedSubscription(cacheKey);
-          if (cached !== undefined) return cached;
-
-          try {
-            if (AppConfig.API_MODE === "server") {
-              return await this.checkSubscriptionFromServer(
-                cleanUsername,
-                cacheKey,
-              );
-            }
-            return await this.checkSubscriptionDirect(
-              cleanUsername,
-              userId,
-              cacheKey,
-            );
-          } catch (err) {
-            ErrorHandler.log("SponsorApiService.checkSubscription", err);
-            this.setCachedSubscription(cacheKey, false);
-            return false;
-          }
-        }
-
-        static async checkSubscriptionFromServer(username, cacheKey) {
-          const result = await ApiClient.request("sponsors/check", {
-            username,
-          });
-          const isSubscribed = result.ok && result.subscribed === true;
-          this.setCachedSubscription(cacheKey, isSubscribed);
-          return isSubscribed;
-        }
-
-        static async checkSubscriptionDirect(username, userId, cacheKey) {
-          const member = await ApiClient.request("getChatMember", {
-            chat_id: `@${username}`,
-            user_id: userId,
-          });
-
-          if (!member.ok || !member.result) {
-            this.setCachedSubscription(cacheKey, false);
-            return false;
-          }
-
-          const subscribedStatuses = ["creator", "administrator", "member"];
-          const isSubscribed = subscribedStatuses.includes(
-            member.result.status,
-          );
-          this.setCachedSubscription(cacheKey, isSubscribed);
-          return isSubscribed;
-        }
-
-        static async fetchAllSponsorsWithStatus() {
-          const sponsors = this.getSponsors();
-          if (sponsors.length === 0) return [];
-
-          try {
-            if (AppConfig.API_MODE === "server") {
-              const result = await ApiClient.request("sponsors/list");
-
-              if (result.ok && Array.isArray(result.data)) {
-                const userId = TelegramWebApp.userId;
-                result.data.forEach((sponsor) => {
-                  this.setCachedChannel(sponsor.username, {
-                    username: sponsor.username,
-                    title: sponsor.title,
-                    photo: sponsor.photo,
-                  });
-
-                  if (userId) {
-                    this.setCachedSubscription(
-                      `${userId}_${sponsor.username}`,
-                      sponsor.subscribed,
-                    );
-                  }
-                });
-
-                return result.data;
-              }
-            }
-
-            return await Promise.all(
-              sponsors.map(async (username) => {
-                const channel = await this.fetchChannelInfo(username);
-                const subscribed = await this.checkSubscription(username);
-                return { ...channel, subscribed };
-              }),
-            );
-          } catch (err) {
-            ErrorHandler.log(
-              "SponsorApiService.fetchAllSponsorsWithStatus",
-              err,
-            );
-            return [];
-          }
-        }
-
-        static clearSubscriptionCache() {
-          this.subscriptionCache.clear();
-          for (const key of this.cacheTimestamps.keys()) {
-            if (key.startsWith("sub_")) {
-              this.cacheTimestamps.delete(key);
-            }
-          }
-        }
-
-        static getChannelUrl(username) {
-          return `https://t.me/${username.replace(/^@/, "").trim()}`;
-        }
-      }
+      };
 
       class VideoPlatform {
         constructor(config) {
@@ -1457,36 +1207,34 @@
         }
 
         extractId(url) {
-          try {
-            if (this._extractId) return this._extractId(url);
-            for (const pattern of this.patterns) {
-              const match = url.match(pattern);
-              if (match?.[1]) return match[1];
-            }
-            return null;
-          } catch {
-            return null;
+          if (this._extractId) return this._extractId(url);
+          for (const pattern of this.patterns) {
+            const match = url.match(pattern);
+            if (match?.[1]) return match[1];
           }
+          return null;
         }
 
         getAuthorUrl(author) {
-          try {
-            if (!this.authorUrlTemplate || !author?.unique_id) return null;
-            return this.authorUrlTemplate.replace(
-              "{username}",
-              author.unique_id,
-            );
-          } catch {
-            return null;
-          }
+          if (!this.authorUrlTemplate || !author?.unique_id) return null;
+          return this.authorUrlTemplate.replace("{username}", author.unique_id);
         }
 
-        async fetchVideo(url, quality = "hd") {
+        async fetchVideo(url, quality = "hd", externalSignal) {
           const controller = new AbortController();
           const timeoutId = setTimeout(
             () => controller.abort(),
-            AppConfig.FETCH_TIMEOUT,
+            AppConfig.FETCH_TIMEOUT
           );
+
+          if (externalSignal) {
+            if (externalSignal.aborted) controller.abort();
+            externalSignal.addEventListener(
+              "abort",
+              () => controller.abort(),
+              { once: true }
+            );
+          }
 
           try {
             const q = this.supportsQuality ? quality : "sd";
@@ -1505,26 +1253,15 @@
         }
 
         getShareParam(video, url) {
-          try {
-            const id = video?.id || this.extractId(url);
-            if (id) return `${this.name.toLowerCase()}_${id}`;
-            const utf8Bytes = new TextEncoder().encode(url);
-            const binaryString = String.fromCharCode(...utf8Bytes);
-            return btoa(binaryString).replace(
-              /[+/=]/g,
-              (c) => ({ "+": "-", "/": "_" })[c] || "",
-            );
-          } catch {
-            return null;
-          }
+          const id = video?.id || this.extractId(url);
+          if (id) return `${this.name.toLowerCase()}_${id}`;
+          const utf8Bytes = new TextEncoder().encode(url);
+          const binaryString = String.fromCharCode(...utf8Bytes);
+          return btoa(binaryString).replace(/[+/=]/g, (c) => ({ "+": "-", "/": "_" })[c] || "");
         }
 
         buildUrlFromId(id) {
-          try {
-            return this._buildUrlFromId?.(id) || null;
-          } catch {
-            return null;
-          }
+          return this._buildUrlFromId?.(id) || null;
         }
       }
 
@@ -1541,7 +1278,6 @@
         }
 
         static get(name) {
-          if (!name) return null;
           return this.platforms.find((p) => p.name === name) || null;
         }
 
@@ -1552,132 +1288,109 @@
         static parseStartParam(param) {
           if (!param || typeof param !== "string") return null;
 
-          try {
-            const platformMatch = param.match(/^([a-z]+)_(.+)$/i);
-
-            if (platformMatch) {
-              const [, platformName, id] = platformMatch;
-
-              const platform = this.platforms.find(
-                (p) => p.name.toLowerCase() === platformName.toLowerCase(),
-              );
-
-              if (!platform) {
-                return { error: "unsupported_platform", platformName };
-              }
-
-              if (/^\d+$/.test(id)) {
-                const url = platform.buildUrlFromId(id);
-                if (url) {
-                  return { platform: platform.name, id, url };
-                }
-              }
-
-              return { error: "invalid_id", platformName: platform.name };
+          const platformMatch = param.match(/^([a-z]+)_(.+)$/i);
+          if (platformMatch) {
+            const [, platformName, id] = platformMatch;
+            const platform = this.platforms.find(
+              (p) => p.name.toLowerCase() === platformName.toLowerCase()
+            );
+            if (!platform) return { error: "unsupported_platform", platformName };
+            if (/^\d+$/.test(id)) {
+              const url = platform.buildUrlFromId(id);
+              if (url) return { platform: platform.name, id, url };
             }
-
-            if (param.length > 10) {
-              let base64 = param.replace(/-/g, "+").replace(/_/g, "/");
-              const padLength = (4 - (base64.length % 4)) % 4;
-              base64 += "=".repeat(padLength);
-
-              try {
-                const binaryString = atob(base64);
-                const bytes = Uint8Array.from(binaryString, (c) =>
-                  c.charCodeAt(0),
-                );
-                const decoded = new TextDecoder("utf-8", {
-                  fatal: true,
-                }).decode(bytes);
-
-                if (
-                  decoded.startsWith("http") &&
-                  UrlValidator.isValid(decoded)
-                ) {
-                  const platform = this.detect(decoded);
-                  if (platform) {
-                    return { platform: platform.name, id: null, url: decoded };
-                  }
-                  return { error: "unsupported_platform", url: decoded };
-                }
-              } catch {}
-            }
-          } catch (err) {
-            ErrorHandler.log("PlatformRegistry.parseStartParam", err);
+            return { error: "invalid_id", platformName: platform.name };
           }
 
+          if (param.length > 10) {
+            let base64 = param.replace(/-/g, "+").replace(/_/g, "/");
+            const padLength = (4 - (base64.length % 4)) % 4;
+            base64 += "=".repeat(padLength);
+            try {
+              const decoded = new TextDecoder("utf-8", { fatal: true }).decode(
+                Uint8Array.from(atob(base64), (c) => c.charCodeAt(0))
+              );
+              if (decoded.startsWith("http") && UrlValidator.isValid(decoded)) {
+                const platform = this.detect(decoded);
+                if (platform) return { platform: platform.name, id: null, url: decoded };
+                return { error: "unsupported_platform", url: decoded };
+              }
+            } catch {}
+          }
           return { error: "invalid_format" };
         }
       }
 
-      class TikTokErrorHandler {
-        static ERROR_MAP = {
-          "url parsing failed":
-            "Не удалось обработать ссылку. Проверьте правильность URL",
-          "video not found": "Видео не найдено",
-          "video is private": "Это приватное видео",
-          "video has been removed": "Видео было удалено",
-          "video is unavailable": "Видео недоступно",
-          "user not found": "Пользователь не найден",
-          "account is private": "Аккаунт приватный",
-          "video under review": "Видео на проверке",
-          "content not available": "Контент недоступен в вашем регионе",
-          "rate limit exceeded": "Слишком много запросов. Попробуйте позже",
-          "invalid url": "Неверный формат ссылки",
-          "empty url": "Ссылка не указана",
-        };
-
-        static translate(message) {
-          if (!message) return "Произошла неизвестная ошибка";
-
-          const lowerMessage = message.toLowerCase().trim();
-
-          for (const [key, value] of Object.entries(this.ERROR_MAP)) {
-            if (lowerMessage.includes(key.toLowerCase())) {
-              return value;
-            }
+      const TopWidgetData = Object.freeze({
+        countries: [
+          { code: "ru", name: "Россия" },
+          { code: "kz", name: "Казахстан" },
+          { code: "ua", name: "Украина" },
+          { code: "us", name: "USA" },
+          { code: "tr", name: "Türkiye" },
+        ],
+        videos: {
+          TikTok: {
+            ru: [
+              {
+                id: "t1",
+                title: "Лучшие переходы недели",
+                author: "@visuals",
+                views: "1.4M",
+                duration: "0:24",
+                cover:
+                  "https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e?q=80&w=400&auto=format&fit=crop",
+              },
+              {
+                id: "t2",
+                title: "Город в режиме неона",
+                author: "@nightlife",
+                views: "948K",
+                duration: "0:31",
+                cover:
+                  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=400&auto=format&fit=crop",
+              },
+              {
+                id: "t3",
+                title: "Новый тренд: slowmo",
+                author: "@motion",
+                views: "2.1M",
+                duration: "0:29",
+                cover:
+                  "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?q=80&w=400&auto=format&fit=crop",
+              },
+              {
+                id: "t4",
+                title: "Утро в мегаполисе",
+                author: "@citylife",
+                views: "630K",
+                duration: "0:20",
+                cover:
+                  "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?q=80&w=400&auto=format&fit=crop",
+              },
+              {
+                id: "t5",
+                title: "Свет, камера, движение",
+                author: "@studio",
+                views: "1.1M",
+                duration: "0:27",
+                cover:
+                  "https://images.unsplash.com/photo-1487412912498-0447578fcca8?q=80&w=400&auto=format&fit=crop",
+              },
+              {
+                id: "t6",
+                title: "Трендовый монтаж",
+                author: "@cut",
+                views: "712K",
+                duration: "0:22",
+                cover:
+                  "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=400&auto=format&fit=crop",
+              }
+            ],
+            default: []
           }
-
-          if (lowerMessage.includes("private")) {
-            return "Это приватное видео";
-          }
-          if (
-            lowerMessage.includes("not found") ||
-            lowerMessage.includes("not exist")
-          ) {
-            return "Видео не найдено";
-          }
-          if (
-            lowerMessage.includes("removed") ||
-            lowerMessage.includes("deleted")
-          ) {
-            return "Видео было удалено";
-          }
-          if (lowerMessage.includes("unavailable")) {
-            return "Видео недоступно";
-          }
-          if (
-            lowerMessage.includes("parsing") ||
-            lowerMessage.includes("parse")
-          ) {
-            return "Не удалось обработать ссылку. Убедитесь, что это корректная ссылка TikTok";
-          }
-          if (
-            lowerMessage.includes("region") ||
-            lowerMessage.includes("country")
-          ) {
-            return "Видео недоступно в вашем регионе";
-          }
-          if (
-            lowerMessage.includes("limit") ||
-            lowerMessage.includes("too many")
-          ) {
-            return "Слишком много запросов. Подождите минуту и попробуйте снова";
-          }
-
-          return "Не удалось загрузить видео. Попробуйте другую ссылку";
         }
-      }
+      });
 
       PlatformRegistry.register({
         name: "TikTok",
@@ -1686,8 +1399,7 @@
           progress: "#ffffff",
           icon: "#ffffff",
           save: "#fe2c55",
-          story: "#ffffff",
-          statsBg: "#fe2c5520",
+          story: "#f7f7f7",
           statsIcon: "#fe2c55",
         },
         icon: "M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64c.29 0 .58.04.88.13V9.4c-.29-.03-.6-.05-1-.05A6.33 6.33 0 0 0 5 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4c-.35-.05-.7-.08-1.04-.1z",
@@ -1733,23 +1445,17 @@
           return `https://www.tiktok.com/@_/video/${id}`;
         },
         async _fetch(url, signal, quality = "hd") {
-          if (!url || typeof url !== "string") {
-            throw new Error("Вставьте ссылку на видео");
-          }
+          if (!url || typeof url !== "string") throw new Error("Вставьте ссылку на видео");
 
           const trimmedUrl = url.trim();
-          if (!trimmedUrl) {
-            throw new Error("Ссылка не может быть пустой");
-          }
+          if (!trimmedUrl) throw new Error("Ссылка не может быть пустой");
 
           let response;
           try {
             response = await fetch("https://www.tikwm.com/api/", {
               method: "POST",
-              headers: {
-                "Content-Type": "application/x-www-form-urlencoded",
-              },
-              body: new URLSearchParams({ url: trimmedUrl, hd: 1 }),
+              headers: { "Content-Type": "application/x-www-form-urlencoded" },
+              body: new URLSearchParams({ url: trimmedUrl, hd: quality === "hd" ? 1 : 0 }),
               signal,
             });
           } catch (err) {
@@ -1757,9 +1463,7 @@
             throw new Error("Ошибка сети. Проверьте подключение к интернету");
           }
 
-          if (!response.ok) {
-            throw new Error(`Сервер недоступен (${response.status})`);
-          }
+          if (!response.ok) throw new Error(`Сервер недоступен (${response.status})`);
 
           let json;
           try {
@@ -1768,21 +1472,10 @@
             throw new Error("Ошибка обработки ответа сервера");
           }
 
-          if (json.code !== 0) {
-            throw new Error(TikTokErrorHandler.translate(json.msg));
-          }
+          if (json.code !== 0) throw new Error(json.msg || "Не удалось получить данные");
 
           const data = json.data;
-
-          if (!data) {
-            throw new Error("Сервер вернул пустой ответ");
-          }
-
-          if (!data.play) {
-            throw new Error(
-              "Ссылка на видео недоступна. Возможно, видео приватное или удалено",
-            );
-          }
+          if (!data?.play) throw new Error("Ссылка на видео недоступна");
 
           data.hdPlay = data.hdplay || null;
           data.hasHD = Boolean(data.hdplay);
@@ -1805,15 +1498,15 @@
         video: null,
         error: null,
         history: [],
-        sponsorsList: [],
-        sponsorsLoading: true,
-        progressTimer: null,
         selectedQuality: "hd",
-        featurePromptTimer: null,
-        isRefreshing: false,
-        downloadAbortController: null,
         isChangingQuality: false,
         isSaving: false,
+        progressTimer: null,
+        downloadAbortController: null,
+        sponsorsList: SponsorService.sponsors,
+        topPlatform: PlatformRegistry.all()[0]?.name || "TikTok",
+        topCountry: TopWidgetData.countries[0]?.code || "ru",
+        topVideos: [],
 
         get statusText() {
           if (this.isLoading) return "Загрузка видео...";
@@ -1833,20 +1526,8 @@
         get visibleStats() {
           if (!this.platform?.stats || !this.video) return [];
           return this.platform.stats.filter(
-            (s) => this.video[s.key] != null && this.video[s.key] > 0,
+            (s) => this.video[s.key] != null && this.video[s.key] > 0
           );
-        },
-
-        get unsubscribedSponsors() {
-          return this.sponsorsList.filter((s) => !s.subscribed);
-        },
-
-        get hasUnsubscribedSponsors() {
-          return this.unsubscribedSponsors.length > 0;
-        },
-
-        get sponsorsCount() {
-          return AppConfig.SPONSORS.length;
         },
 
         get hasMultipleQualities() {
@@ -1858,161 +1539,52 @@
         get availableQualities() {
           if (!this.platform?.qualities) return [];
           if (!this.video) return this.platform.qualities;
-          if (this.video.hasHD !== true) {
-            return this.platform.qualities.filter((q) => q.key === "sd");
-          }
+          if (!this.video.hasHD) return this.platform.qualities.filter((q) => q.key === "sd");
           return this.platform.qualities;
         },
 
         get currentQualityLabel() {
           if (!this.video) return "";
-          return this.selectedQuality === "hd" && this.video.hasHD
-            ? "HD"
-            : "SD";
+          return this.selectedQuality === "hd" && this.video.hasHD ? "HD" : "SD";
         },
 
         get currentVideoUrl() {
           if (!this.video?.play) return null;
-
-          if (this.selectedQuality === "hd" && this.video.hdPlay) {
-            if (this.video.hdPlay !== this.video.play) {
-              return this.video.hdPlay;
-            }
-          }
+          if (this.selectedQuality === "hd" && this.video.hdPlay) return this.video.hdPlay;
           return this.video.play;
         },
 
-        async init() {
+        get topCountries() {
+          return TopWidgetData.countries;
+        },
+
+        get unconfirmedSponsors() {
+          return this.sponsorsList.filter((s) => !SponsorService.isConfirmed(s.username));
+        },
+
+        init() {
           TelegramWebApp.initialize();
-          this.history = await HistoryStorage.getAll();
+          this.updateTopVideos();
+          HistoryStorage.getAll().then((list) => (this.history = list));
           this.handleStartParam();
-          this.loadSponsors();
-          this.promptTelegramFeatures();
         },
 
-        destroy() {
-          try {
-            this.stopProgress();
-
-            if (this.featurePromptTimer) {
-              clearTimeout(this.featurePromptTimer);
-              this.featurePromptTimer = null;
-            }
-
-            if (this.downloadAbortController) {
-              this.downloadAbortController.abort();
-              this.downloadAbortController = null;
-            }
-
-            this.isLoading = false;
-            this.isRefreshing = false;
-            this.sponsorsLoading = false;
-          } catch (err) {
-            ErrorHandler.log("destroy", err);
-          }
+        updateTopVideos() {
+          const platform = TopWidgetData.videos[this.topPlatform];
+          const list =
+            platform?.[this.topCountry] ||
+            platform?.default ||
+            TopWidgetData.videos.TikTok.ru;
+          this.topVideos = list.slice(0, 6);
         },
 
-        promptTelegramFeatures() {
-          this.featurePromptTimer = setTimeout(() => {
-            if (TelegramWebApp.canRequestWriteAccess) {
-              TelegramWebApp.requestWriteAccess();
-            }
-            this.featurePromptTimer = null;
-          }, 2000);
-        },
-
-        async loadSponsors() {
-          const sponsors = SponsorApiService.getSponsors();
-          if (sponsors.length === 0) {
-            this.sponsorsLoading = false;
-            return;
-          }
-
-          try {
-            this.sponsorsList =
-              await SponsorApiService.fetchAllSponsorsWithStatus();
-          } catch (err) {
-            ErrorHandler.log("loadSponsors", err);
-            this.sponsorsList = [];
-          } finally {
-            this.sponsorsLoading = false;
-          }
-        },
-
-        async refreshSubscriptions() {
-          if (this.isRefreshing || this.sponsorsLoading) return;
-
-          this.isRefreshing = true;
-          this.sponsorsLoading = true;
-          SponsorApiService.clearSubscriptionCache();
-          TelegramWebApp.hapticImpact("light");
-
-          try {
-            const sponsors = SponsorApiService.getSponsors();
-            if (sponsors.length === 0) {
-              this.sponsorsList = [];
-              return;
-            }
-            this.sponsorsList =
-              await SponsorApiService.fetchAllSponsorsWithStatus();
-          } catch (err) {
-            ErrorHandler.log("refreshSubscriptions", err);
-          } finally {
-            this.sponsorsLoading = false;
-            this.isRefreshing = false;
-          }
-        },
-
-        openSponsor(username) {
-          TelegramWebApp.hapticImpact("light");
-          TelegramWebApp.openTelegramLink(
-            SponsorApiService.getChannelUrl(username),
-          );
-        },
-
-        handleStartParam() {
-          const param = TelegramWebApp.startParam;
-          if (!param) return;
-
-          const parsed = PlatformRegistry.parseStartParam(param);
-
-          if (!parsed || parsed.error) {
-            switch (parsed?.error) {
-              case "unsupported_platform":
-                this.setError(
-                  `Платформа "${parsed.platformName || "неизвестная"}" не поддерживается`,
-                );
-                break;
-              case "invalid_id":
-                this.setError("Неверный идентификатор видео");
-                break;
-              case "invalid_format":
-              default:
-                this.setError("Неверная ссылка");
-                break;
-            }
-            return;
-          }
-
-          const platform = PlatformRegistry.get(parsed.platform);
-          if (!platform) {
-            this.setError("Платформа не поддерживается");
-            return;
-          }
-
-          const url = parsed.url || platform.buildUrlFromId(parsed.id);
-          if (url) {
-            this.url = url;
-            this.platform = platform;
-            this.$nextTick(() => this.download());
-          } else {
-            this.setError("Не удалось восстановить ссылку");
-          }
+        selectTopPlatform(name) {
+          this.topPlatform = name;
+          this.updateTopVideos();
         },
 
         detect() {
           this.error = null;
-
           if (!this.url?.trim()) {
             this.platform = null;
             this.video = null;
@@ -2029,9 +1601,7 @@
 
           const detected = PlatformRegistry.detect(this.url);
           if (detected) {
-            if (this.platform?.name !== detected.name) {
-              this.selectedQuality = "hd";
-            }
+            if (this.platform?.name !== detected.name) this.selectedQuality = "hd";
             this.platform = detected;
             TelegramWebApp.hapticImpact("light");
           } else {
@@ -2055,43 +1625,13 @@
           TelegramWebApp.hapticNotification("error");
         },
 
-        scrollToError() {
-          this.$nextTick(() => {
-            const errorEl = document.querySelector('[x-ref="errorSection"]');
-            if (errorEl) {
-              errorEl.scrollIntoView({ behavior: "smooth", block: "center" });
-            }
-          });
-        },
-
-        scrollToSponsors() {
-          this.$nextTick(() => {
-            const sponsorEl = document.querySelector(
-              '[x-ref="sponsorSection"]',
-            );
-            if (sponsorEl) {
-              sponsorEl.scrollIntoView({
-                behavior: "smooth",
-                block: "center",
-              });
-            }
-          });
-        },
-
         startProgress() {
           this.stopProgress();
           this.progressTimer = setInterval(() => {
             const step =
-              Math.floor(
-                Math.random() *
-                  (AppConfig.PROGRESS_STEP_MAX -
-                    AppConfig.PROGRESS_STEP_MIN +
-                    1),
-              ) + AppConfig.PROGRESS_STEP_MIN;
-            this.progress = Math.min(
-              this.progress + step,
-              AppConfig.PROGRESS_LIMIT,
-            );
+              Math.floor(Math.random() * (AppConfig.PROGRESS_STEP_MAX - AppConfig.PROGRESS_STEP_MIN + 1)) +
+              AppConfig.PROGRESS_STEP_MIN;
+            this.progress = Math.min(this.progress + step, AppConfig.PROGRESS_LIMIT);
           }, AppConfig.PROGRESS_INTERVAL);
         },
 
@@ -2105,53 +1645,48 @@
         async selectQuality(quality) {
           if (!this.video || !this.platform) return;
           if (quality === "hd" && !this.video.hasHD) return;
-          if (this.selectedQuality === quality) return;
-          if (this.isChangingQuality) return;
+          if (this.selectedQuality === quality || this.isChangingQuality) return;
 
           this.isChangingQuality = true;
-
-          const videoPlayer = this.$refs.videoPlayer;
-          const wasPlaying = videoPlayer && !videoPlayer.paused;
-          const currentTime = videoPlayer?.currentTime || 0;
-
+          const videoEl = document.querySelector("video");
+          const wasPlaying = videoEl && !videoEl.paused;
+          const currentTime = videoEl?.currentTime || 0;
           const oldQuality = this.selectedQuality;
 
           this.selectedQuality = quality;
-          TelegramWebApp.hapticImpact("light");
+          Telegram.WebApp.hapticImpact("light");
 
           await this.$nextTick();
 
-          if (videoPlayer) {
+          if (videoEl) {
             try {
-              videoPlayer.load();
+              videoEl.load();
 
               await new Promise((resolve, reject) => {
                 const onLoaded = () => {
-                  videoPlayer.removeEventListener("loadeddata", onLoaded);
-                  videoPlayer.removeEventListener("error", onError);
+                  videoEl.removeEventListener("loadeddata", onLoaded);
+                  videoEl.removeEventListener("error", onError);
                   resolve();
                 };
                 const onError = () => {
-                  videoPlayer.removeEventListener("loadeddata", onLoaded);
-                  videoPlayer.removeEventListener("error", onError);
+                  videoEl.removeEventListener("loadeddata", onLoaded);
+                  videoEl.removeEventListener("error", onError);
                   reject(new Error("Ошибка загрузки видео"));
                 };
 
-                videoPlayer.addEventListener("loadeddata", onLoaded);
-                videoPlayer.addEventListener("error", onError);
-
+                videoEl.addEventListener("loadeddata", onLoaded);
+                videoEl.addEventListener("error", onError);
                 setTimeout(resolve, 3000);
               });
 
-              videoPlayer.currentTime = currentTime;
+              videoEl.currentTime = currentTime;
 
               if (wasPlaying) {
                 try {
-                  await videoPlayer.play();
+                  await videoEl.play();
                 } catch {}
               }
-            } catch (err) {
-              ErrorHandler.log("selectQuality", err);
+            } catch {
               this.selectedQuality = oldQuality;
             }
           }
@@ -2162,16 +1697,13 @@
 
         async updateHistoryQuality() {
           if (!this.video || !this.platform) return;
-
-          const historyId =
-            this.video.id || `${this.platform.name}_${Date.now()}`;
+          const historyId = this.video.id || `${this.platform.name}_${Date.now()}`;
           await HistoryStorage.updateQuality(historyId, this.selectedQuality);
           this.history = await HistoryStorage.getAll();
         },
 
         async saveToHistory() {
           if (!this.video || !this.platform) return;
-
           await HistoryStorage.add({
             id: this.video.id || `${this.platform.name}_${Date.now()}`,
             cover: this.video.cover,
@@ -2186,9 +1718,79 @@
           this.history = await HistoryStorage.getAll();
         },
 
+        hasSponsorAccess() {
+          return this.unconfirmedSponsors.length === 0;
+        },
+
+        canConfirmSponsor(username) {
+          return SponsorService.canConfirm(username);
+        },
+
+        isSponsorConfirmed(username) {
+          return SponsorService.isConfirmed(username);
+        },
+
+        confirmSponsor(username) {
+          if (!SponsorService.canConfirm(username)) {
+            this.setError("Сначала откройте канал спонсора");
+            return;
+          }
+          SponsorService.confirm(username);
+          TelegramWebApp.hapticNotification("success");
+        },
+
+        openSponsor(username) {
+          SponsorService.markOpened(username);
+          TelegramWebApp.hapticImpact("light");
+          TelegramWebApp.openTelegramLink(`https://t.me/${username}`);
+        },
+
+        handleStartParam() {
+          const param = TelegramWebApp.startParam;
+          if (!param) return;
+
+          const parsed = PlatformRegistry.parseStartParam(param);
+
+          if (!parsed || parsed.error) {
+            switch (parsed?.error) {
+              case "unsupported_platform":
+                this.setError(
+                  `Платформа "${parsed.platformName || "неизвестная"}" не поддерживается`
+                );
+                break;
+              case "invalid_id":
+                this.setError("Неверный идентификатор видео");
+                break;
+              default:
+                this.setError("Неверная ссылка");
+                break;
+            }
+            return;
+          }
+
+          const platform = PlatformRegistry.get(parsed.platform);
+          if (!platform) {
+            this.setError("Платформа не поддерживается");
+            return;
+          }
+
+          const url = parsed.url || platform.buildUrlFromId(parsed.id);
+          if (url) {
+            this.url = url;
+            this.platform = platform;
+            this.$nextTick(() => this.download());
+          } else {
+            this.setError("Не удалось восстановить ссылку");
+          }
+        },
+
         async download() {
-          if (!this.platform || this.isLoading) return;
-          if (!this.url?.trim()) return;
+          if (!this.platform || this.isLoading || !this.url?.trim()) return;
+
+          if (!this.hasSponsorAccess()) {
+            this.setError("Подпишитесь на спонсоров для загрузки видео");
+            return;
+          }
 
           if (this.downloadAbortController) {
             this.downloadAbortController.abort();
@@ -2196,24 +1798,6 @@
           this.downloadAbortController = new AbortController();
 
           this.isLoading = true;
-
-          while (this.sponsorsLoading) {
-            await new Promise((r) => setTimeout(r, 50));
-          }
-
-          if (this.hasUnsubscribedSponsors) {
-            await this.refreshSubscriptions();
-          }
-
-          if (this.hasUnsubscribedSponsors) {
-            this.isLoading = false;
-            this.downloadAbortController = null;
-            this.setError("Подпишитесь на спонсоров для загрузки видео");
-            this.scrollToSponsors();
-            return;
-          }
-
-          this.$refs.input?.blur();
           this.progress = 0;
           this.error = null;
           this.video = null;
@@ -2225,7 +1809,7 @@
             this.video = await this.platform.fetchVideo(
               this.url,
               this.selectedQuality,
-              this.downloadAbortController.signal,
+              this.downloadAbortController.signal
             );
             this.progress = 100;
 
@@ -2249,29 +1833,21 @@
         },
 
         saveVideo() {
-          if (!this.video || !this.platform || this.isSaving) {
-            return;
-          }
+          if (!this.video || !this.platform || this.isSaving) return;
 
           const videoUrl = this.currentVideoUrl;
-          if (!videoUrl) {
-            return;
-          }
+          if (!videoUrl) return;
 
           this.isSaving = true;
 
           try {
             const filename = this.platform.getFilename(
               this.video,
-              this.selectedQuality,
+              this.selectedQuality
             );
             const success = TelegramWebApp.downloadFile(videoUrl, filename);
-
-            if (success) {
-              TelegramWebApp.hapticNotification("success");
-            } else {
-              this.setError("Скачивание доступно только в мобильном Telegram");
-            }
+            if (success) TelegramWebApp.hapticNotification("success");
+            else this.setError("Скачивание доступно только в мобильном Telegram");
           } finally {
             setTimeout(() => {
               this.isSaving = false;
@@ -2280,9 +1856,7 @@
         },
 
         shareStory() {
-          if (!this.video || !this.platform) {
-            return;
-          }
+          if (!this.video || !this.platform) return;
 
           const videoUrl = this.currentVideoUrl;
           if (!videoUrl) {
@@ -2296,12 +1870,8 @@
           }
 
           const success = TelegramWebApp.shareToStory(videoUrl, text);
-
-          if (success) {
-            TelegramWebApp.hapticNotification("success");
-          } else {
-            this.setError("Истории доступны только в мобильном Telegram");
-          }
+          if (success) TelegramWebApp.hapticNotification("success");
+          else this.setError("Истории доступны только в мобильном Telegram");
         },
 
         shareLink() {
@@ -2328,9 +1898,7 @@
           if (!this.platform || !this.video?.author) return;
 
           const url = this.platform.getAuthorUrl(this.video.author);
-          if (url) {
-            TelegramWebApp.openExternalLink(url);
-          }
+          if (url) TelegramWebApp.openExternalLink(url);
         },
 
         loadFromHistory(item) {
@@ -2361,7 +1929,7 @@
           }
         },
 
-        async clearHistory() {
+        clearHistory() {
           TelegramWebApp.showConfirm(
             "Вы уверены, что хотите очистить историю?",
             async (confirmed) => {
@@ -2370,7 +1938,7 @@
                 this.history = [];
                 TelegramWebApp.hapticImpact("medium");
               }
-            },
+            }
           );
         },
       }));

@@ -641,7 +641,7 @@
 
           const getContext = () => {
               if (!ctx) {
-                  const AC = globalThis.AudioContext ? ? globalThis.webkitAudioContext;
+                  const AC = globalThis.AudioContext ?? globalThis.webkitAudioContext;
                   if (AC) ctx = new AC();
               }
               return ctx;
@@ -678,7 +678,7 @@
           if (!trimmed || trimmed.length > MAX_INPUT_LENGTH) return null;
 
           const code = trimmed.startsWith("CEN;") ?
-              (trimmed.split(";").at(1) ? ? "") :
+              (trimmed.split(";").at(1) ?? "") :
               trimmed;
 
           return EAN_PATTERN.test(code) ? code : null;
@@ -893,7 +893,7 @@
                   if (!Array.isArray(data?.items)) return;
 
                   this.items = data.items;
-                  this.counter = data.counter ? ? data.items.length;
+                  this.counter = data.counter ?? data.items.length;
                   this.codes = new Set(data.items.map((i) => i.code));
 
                   this.$nextTick(() => {

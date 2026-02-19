@@ -1238,7 +1238,6 @@
 
         init() {
           TelegramApp.init();
-          // this.applyPreset("default");
         },
 
         destroy() {
@@ -1291,11 +1290,6 @@
 
           try {
             const vars = extractVariables(f);
-            if (vars.length === 0) {
-              this.formulaError = "Формула не содержит переменных";
-              this.parsedVars = [];
-              return;
-            }
 
             const oldValues = { ...this.values };
             this.values = {};
@@ -1319,6 +1313,12 @@
               this.values[v] !== "" &&
               !isNaN(this.values[v]),
           );
+          
+          if (!allFilled) {
+            this.result = null;
+            this.attestations = [];
+            return;
+          }
 
           try {
             const vars = {};
@@ -1327,18 +1327,18 @@
             }
 
             const res = safeEvaluate(this.formula, vars);
-            this.result = Math.round(res * 100) / 100;
+            this.result = res;
 
-            const premiaTO = vars["премия_ТО"] || this.result * 0.15;
+            const premiaTO = vars["премия_ТО"] || 0;
 
             const attData = ATTESTATION[this.role] || ATTESTATION.staff;
             this.attestations = attData.map((a) => {
-              const bonus = Math.round(premiaTO * a.ka * 100) / 100;
+              const bonus = premiaTO * a.ka;
               return {
                 name: a.name,
                 ka: a.ka,
                 bonus,
-                total: Math.round((this.result + bonus) * 100) / 100,
+                total: this.result + bonus,
               };
             });
 
@@ -1382,8 +1382,10 @@
         formatMoney(value) {
           if (value === null || value === undefined || isNaN(value))
             return "0 ₽";
-          const rounded = Math.round(value);
-          return rounded.toLocaleString("ru-RU") + " ₽";
+          return value.toLocaleString("ru-RU", {
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0,
+          }) + " ₽";
         },
 
         showToast(message, type = "success") {
